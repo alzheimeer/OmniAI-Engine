@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Environment variables
+.env
+.env.*
+
+# Secrets and OAuth tokens
+oauth2.tokens.json
+oauth2.tokens.channel2.json
+oauth2.keys.json
+
+# Content and media (Generated files, videos, audios, thumbnails)
+content/*
+!content/.gitkeep
+
+# Data and SQLite databases
+data/*
+!data/.gitkeep
+*.sqlite
+*.sqlite-journal
+
+# Temporary and cache directories
+temp/
+cache/
+logs/
+test-output/
+test-logs-retry/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

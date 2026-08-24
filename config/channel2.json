@@ -1,0 +1,10 @@
+{
+  "name": "NeuroTech AI",
+  "description": "AI productivity hacks for ADHD & Neurodivergent",
+  "focus": ["ADHD", "productivity", "automation", "digital business"],
+  "languages": ["Spanish", "English"],
+  "defaultLanguage": "Spanish",
+  "tokenFile": "oauth2.channel2.tokens.json",
+  "category": "27",
+  "notifySubscribers": false
+}

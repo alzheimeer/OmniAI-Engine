@@ -1,0 +1,43 @@
+{
+  "cache": {
+    "ttl": {
+      "videos": "30d",
+      "audio": "7d",
+      "thumbnails": "3d",
+      "music": "14d"
+    }
+  },
+  "retry": {
+    "deepSeek": {
+      "maxRetries": 3,
+      "baseDelay": 2000
+    },
+    "googleTTS": {
+      "maxRetries": 3,
+      "baseDelay": 1000
+    },
+    "pexels": {
+      "maxRetries": 5,
+      "baseDelay": 1000
+    },
+    "youtube": {
+      "maxRetries": 3,
+      "baseDelay": 2000
+    }
+  },
+  "render": {
+    "concurrency": 1,
+    "maxConcurrency": 2,
+    "backoffDelays": [5000, 15000, 45000],
+    "shutdownTimeoutMs": 300000
+  },
+  "video": {
+    "shortMaxDuration": 60,
+    "longMinDuration": 180,
+    "defaultResolution": "1080p"
+  },
+  "redis": {
+    "defaultHost": "127.0.0.1",
+    "defaultPort": 6379
+  }
+}

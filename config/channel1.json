@@ -1,0 +1,10 @@
+{
+  "name": "NeuroSync AI",
+  "description": "Autism & AI: empowering autistic minds",
+  "focus": ["autism", "cognitive tools", "sensory support", "social skills"],
+  "languages": ["Spanish", "English", "Portuguese"],
+  "defaultLanguage": "Spanish",
+  "tokenFile": "oauth2.tokens.json",
+  "category": "27",
+  "notifySubscribers": true
+}

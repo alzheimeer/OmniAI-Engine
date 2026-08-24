@@ -1,0 +1,11 @@
+node_modules
+dist
+content
+.env
+oauth2.tokens.json
+npm-debug.log
+.git
+.agents
+*.mp4
+*.mp3
+*.md

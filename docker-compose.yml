@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  omniai-engine:
+    build: .
+    container_name: omniai-engine
+    restart: unless-stopped
+    ports:
+      - "3003:3003"
+    volumes:
+      - ./.env:/usr/src/app/.env:ro
+      - ./oauth2.tokens.json:/usr/src/app/oauth2.tokens.json
+      - ./oauth2.tokens.channel2.json:/usr/src/app/oauth2.tokens.channel2.json
+      - ./content:/usr/src/app/content
+    environment:
+      - NODE_ENV=production
+      - TZ=America/Bogota
+      - REDIS_HOST=ain-redis
+    networks:
+      - ain-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  ain-network:
+    external: true
+    name: autonomous-income-node_ain-network
+
