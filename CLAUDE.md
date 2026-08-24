@@ -164,6 +164,20 @@ Auditoría SEO completa documentada en `docs/AUDITORIA-SEO-YOUTUBE.md`.
 | **Exponential Backoff**| `SEOAgent.ts` | **NUEVO** - Reintentos exponenciales para proteger ante errores 429/50x |
 | **Disk Space Alert** | `SystemReporter.ts` | **NUEVO** - Alerta proactiva en Telegram si el disco es < 5GB |
 | **Network Resiliency** | `docker-compose.yml` | **NUEVO** - Conexión de red externa estable para `ain-redis` |
+| **Estrategia Híbrida** | `YouTubePublisher.ts` | **NUEVO** - Publica 1 de cada 5 videos en privado como borrador |
+| **Fatiga Semántica** | `SEOAgent.ts` / `ScriptGenerator.ts` | **NUEVO** - Inyección de Personas, Títulos max 8 palabras, Blacklist de IA, y formato Multi-Voz en guiones (25%) |
+| **Máscara TTS** | `AudioGenerator.ts` | **NUEVO** - Zero-Silence (`silenceremove`) y micro-mutaciones acústicas (`atempo=1.02`) en 25% de audios |
+| **Retención Extrema** | `VideoRenderer.ts` / `AudioMixer.ts` | **NUEVO** - Hook Visual Epiléptico (Strobing) de 3s y Diseño Sonoro (Impacto `anoisesrc` en 0.0s) |
+
+### Sistema de Evasión de Detección y Retención (NUEVO)
+
+**Problema resuelto:** Mitigar el riesgo de que YouTube detecte la automatización (Shadowban por API), monotonía de los LLMs (fatiga semántica) y mejorar la retención en los primeros 3 segundos.
+
+**Solución implementada:**
+1. **Estrategia Híbrida (API Evasion):** 1 de cada 5 videos se marca como `private` en `YouTubePublisher.ts`. Esto rompe el patrón automatizado y fuerza la publicación manual.
+2. **Romper Fatiga Semántica:** `SEOAgent` utiliza temperatura aleatoria (0.7-0.9), bloquea frases cliché de IA y asume Personas (Académico, Amigo, Periodista). Títulos truncados a 8 palabras máximo. `ScriptGenerator` inyecta formato "Multi-Voz/Entrevista" aleatoriamente.
+3. **Máscara TTS y Zero-Silence:** Uso de `silenceremove` en `AudioGenerator` para cortar milisegundos muertos al inicio. El 25% de los audios reciben `atempo=1.02` para desdibujar la firma acústica de Google TTS.
+4. **Impacto Máximo (Hook):** `AudioMixer` inyecta ruido rosa filtrado (`anoisesrc`) como impacto en el segundo 0.0. `VideoRenderer` aplica un filtro `eq` estroboscópico de contraste/brillo durante los primeros 3 segundos de cualquier video.
 
 ### Sistema de Deduplicación de Temas (NUEVO - Agosto 2026)
 

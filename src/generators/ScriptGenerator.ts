@@ -44,8 +44,13 @@ export class ScriptGenerator {
             ? `The channel "NeuroTech AI" focuses on AI productivity hacks, workplace automation, and digital business for ADHD & Neurodivergent individuals.`
             : `The channel "NeuroSync AI" focuses on Autism & Artificial Intelligence: empowering autistic minds, cognitive tools, sensory support, and social skills through AI.`;
 
+        const isMultiVoice = Math.random() < 0.25;
+        const voiceInstruction = isMultiVoice 
+            ? `\nCRITICAL (MULTI-VOICE FORMAT): Write this script as a dynamic podcast-style interview or a conversational dialogue between two people. This breaks semantic fatigue.`
+            : ``;
+
         const systemPrompt = `You are a viral YouTube Shorts scriptwriter for a channel called "${channelName}". 
-${channelContext}
+${channelContext}${voiceInstruction}
 Write a highly engaging, fast-paced 60-second script about: ${seo.rawTopic}.
 The video's final title will be "${seo.viralTitle}". Ensure the hook and script align with this title.
 IMPORTANT: The entire output (title, description, tags, spokenText) MUST be in ${language.toUpperCase()}.
@@ -150,8 +155,13 @@ The JSON must have this exact structure:
         const duration = seo.targetDurationMinutes || 5;
         const words = seo.wordCountRange || "600-900";
 
+        const isMultiVoice = Math.random() < 0.25;
+        const voiceInstruction = isMultiVoice 
+            ? `\nCRITICAL (MULTI-VOICE FORMAT): Write this script as a dynamic podcast-style interview or a conversational dialogue between two people. This breaks semantic fatigue.`
+            : ``;
+
         const systemPrompt = `You are a viral YouTube documentary scriptwriter for a channel called "${channelName}". 
-${channelContext}
+${channelContext}${voiceInstruction}
 Write a highly engaging, deep-dive ${duration}-minute script about: ${seo.rawTopic}.
 The video's final title will be "${seo.viralTitle}".
 IMPORTANT: The entire output (title, description, tags, spokenText) MUST be in ${language.toUpperCase()}.

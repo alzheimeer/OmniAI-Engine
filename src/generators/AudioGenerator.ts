@@ -90,7 +90,14 @@ export class AudioGenerator {
                 logger.debug(`Limpiados ${chunkFiles.length} archivos temporales de chunks`);
             }
             
-            logger.info(`Audio generado exitosamente`, { outPath });
+            // Post-processing to apply silenceremove and occasional masking
+            const finalOutPath = outPath.replace('.mp3', '_filtered.mp3');
+            await this.applyAudioFilters(outPath, finalOutPath, contentDir);
+            
+            // Reemplazar el original
+            fs.renameSync(finalOutPath, outPath);
+
+            logger.info(`Audio generado y filtrado exitosamente`, { outPath });
             return outPath;
         } catch (error) {
             // REQ-4.4.3: Fallback específico para Google TTS cuando reintentos se agotan
@@ -247,6 +254,30 @@ export class AudioGenerator {
         } finally {
             // Cleanup list file
             try { fs.unlinkSync(listFile); } catch {}
+        }
+    }
+
+    /**
+     * Post-process audio with FFmpeg to remove silence and apply micro-mutations
+     */
+    private static async applyAudioFilters(inputPath: string, outputPath: string, workDir: string): Promise<void> {
+        const applyMasking = Math.random() < 0.25; // 25% of the time, apply deep masking
+        let filterChain = "silenceremove=start_periods=1:start_duration=0.05:start_threshold=-50dB";
+        if (applyMasking) {
+            // A subtle +2% tempo increase to mask the voice fingerprint without losing naturalness
+            filterChain += ",atempo=1.02";
+            logger.info('Aplicando micro-mutación acústica (atempo 1.02)');
+        }
+        
+        try {
+            const ffmpegPath = ffmpegInstaller.path;
+            execSync(
+                `"${ffmpegPath}" -y -i "${inputPath}" -af "${filterChain}" -c:a libmp3lame -q:a 2 "${outputPath}"`,
+                { cwd: workDir, stdio: 'pipe' }
+            );
+        } catch (error) {
+            logger.error('Error al aplicar filtros de audio FFmpeg', error as Error);
+            throw error;
         }
     }
 }

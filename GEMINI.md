@@ -96,5 +96,10 @@ Implementación exhaustiva según spec `omniai-v2-optimization`, enfocada en eva
 5. **Expansión Multiplataforma (Fase 5):**
    - Implementaciones completas de `InstagramPublisher` y `TikTokPublisher` mediante Puppeteer Stealth (en espera de desactivación de la Regla de oro YPP).
    - `MultiPlatformDispatcher`: Horarios aleatorios de publicación y retrasos secuenciales.
-6. **Infraestructura Avanzada (Fase 6):**
+9. **Infraestructura Avanzada (Fase 6):**
    - `CircuitBreaker`, Dead-Letter Queue (BullMQ) y endpoints de métricas.
+7. **Evasión de Detección y Retención (NUEVO):**
+   - Estrategia híbrida en `YouTubePublisher.ts` (1 de cada 5 videos en privado).
+   - Inyección de Personas, Títulos de 8 palabras, y formato Multi-Voz para evadir fatiga semántica de los LLMs.
+   - Máscara TTS con `silenceremove` y `atempo=1.02` para ofuscar firmas acústicas.
+   - Hook visual epiléptico (3s de strobing) e impacto sonoro sintético en el segundo 0.0 para maximizar retención (Shorts y Largos).

@@ -153,11 +153,24 @@ Every single topic MUST combine:
 1. PILLAR 1: Artificial Intelligence (ChatGPT, Claude, Generative AI, AI Tools, Automation).
 2. PILLAR 2: Autism Spectrum & Neurodiversity (Autismo, Asperger, Hiperfoco, Sensibilidad Sensorial, Terapia).`;
 
+        const personas = [
+            "Experto Académico (Tono serio y basado en datos)",
+            "Amigo Entusiasta (Tono casual, muy enérgico y cercano)",
+            "Periodista Investigativo (Tono misterioso y revelador)"
+        ];
+        const selectedPersona = personas[Math.floor(Math.random() * personas.length)];
+
         const systemPrompt = `You are an elite SEO Specialist and AI Content Director for '${channelName}'.
 Your mission is to optimize content strategy using historical performance feedback data under STRICT NICHE GUARDRAILS.
+You MUST adopt the following persona for your generated content and titles: ${selectedPersona}.
 
 STRICT NICHE GUARDRAILS (DO NOT VIOLATE):
 The entire channel is strictly dedicated to: ${channelNiche}
+        
+CRITICAL - ANTI-FATIGUE (BLACKLIST):
+- DO NOT use cliché AI phrases in any generated content.
+- FORBIDDEN WORDS: "En este video", "Descubre", "Sumérgete", "Adéntrate", "En conclusión", "Hola a todos".
+
 
 CRITICAL - TOPIC DEDUPLICATION:
 - You will receive a list of topics already published. DO NOT REPEAT ANY OF THEM.
@@ -176,11 +189,11 @@ ${performanceContext || 'No historical data available yet. Start with core trend
 ${previousTopicsText}
 
 Analyze current tech trends around Artificial Intelligence, Autism, Neurodiversity, and productivity.
-IMPORTANT: Generate a topic that is DIFFERENT from all the previous topics listed above.
+IMPORTANT: Generate a topic that is DIFFERENT from all the previous topics listed.
 Return EXACTLY a JSON object with this structure:
 {
   "rawTopic": "A 1-2 sentence description of the core subject to write about (MUST BE UNIQUE)",
-  "viralTitle": "A highly clickable, SEO-optimized title (under 65 chars)",
+  "viralTitle": "A highly clickable, SEO-optimized title (STRICTLY MAXIMUM 8 WORDS, under 65 chars)",
   "keywords": ["tag1", "tag2", "...", "tag20"], // MUST contain between 15 and 20 highly relevant SEO tags
   "recommendedPostingFrequency": "Short recommendation on how often to publish this week based on engagement",
   "feedbackAnalysis": "1-2 sentences explaining why this topic was chosen AND how it differs from previous content",
@@ -189,6 +202,8 @@ Return EXACTLY a JSON object with this structure:
   "developerActionRequired": "" // Only fill if you need the human developer to change the code/infrastructure
 }`;
 
+        const randomTemp = parseFloat((Math.random() * (0.9 - 0.7) + 0.7).toFixed(2));
+        
         try {
             // REQ-4.4.2: Usar RetryHandler con backoff exponencial para DeepSeek
             // Reemplaza el retry manual anterior con el sistema estandarizado
@@ -199,7 +214,7 @@ Return EXACTLY a JSON object with this structure:
                         { role: 'system', content: systemPrompt },
                         { role: 'user', content: userPrompt }
                     ],
-                    temperature: 0.85, // Slightly higher for more creativity in avoiding duplicates
+                    temperature: randomTemp, // Variable temperature (0.7 to 0.9) to reduce semantic fatigue
                 }),
                 'DeepSeek generateDailySEOStrategy'
             );

@@ -138,7 +138,8 @@ export class VideoRenderer {
                     '-preset ultrafast',
                     '-crf 23',
                     '-pix_fmt yuv420p',
-                    '-vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920',
+                    // Hook Visual Epiléptico (Retención 4s): Strobing de brillo y contraste intenso en los primeros 3s
+                    '-vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=brightness=\'if(between(t,0,3),sin(t*25)*0.3,0)\':contrast=\'if(between(t,0,3),1+sin(t*15)*0.4,1)\'',
                     '-c:a aac',
                     '-b:a 128k',
                     '-shortest',
@@ -264,13 +265,17 @@ export class VideoRenderer {
 
                 logger.debug(`Normalizando escena ${i + 1}`);
                 await new Promise((resolve, reject) => {
+                    const vf = [
+                        'scale=1920:1080:force_original_aspect_ratio=decrease',
+                        'pad=1920:1080:-1:-1',
+                        'setsar=1',
+                        'fps=30'
+                    ];
+                    if (i === 0) {
+                        vf.push('eq=brightness=\'if(between(t,0,3),sin(t*25)*0.3,0)\':contrast=\'if(between(t,0,3),1+sin(t*15)*0.4,1)\'');
+                    }
                     ffmpeg(tempVideoPath)
-                        .videoFilters([
-                            'scale=1920:1080:force_original_aspect_ratio=decrease',
-                            'pad=1920:1080:-1:-1',
-                            'setsar=1',
-                            'fps=30'
-                        ])
+                        .videoFilters(vf)
                         .outputOptions(['-c:v libx264', '-preset ultrafast', '-an'])
                         .save(normVideoPath)
                         .on('end', resolve)

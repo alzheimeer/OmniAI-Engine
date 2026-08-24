@@ -510,7 +510,8 @@ export class AudioMixer {
             
             // Paso 3: Aplicar volumen a la voz y mezclar
             `[0:a]volume=${volume.voiceVolumeDb}dB[v]`,
-            `[v][mc]amix=inputs=2:duration=first:dropout_transition=2[mixed]`,
+            `[2:a]volume=-6dB[impact]`, // Volumen controlado para el sonido de impacto sintético
+            `[v][mc][impact]amix=inputs=3:duration=first:dropout_transition=2[mixed]`,
             
             // Paso 4: Normalización loudnorm (estándar YouTube -16 LUFS)
             `[mixed]loudnorm=I=${normalization.targetLufs}:TP=${normalization.truePeakDb}:LRA=${normalization.loudnessRange}[final]`
@@ -521,6 +522,7 @@ export class AudioMixer {
             '-y',  // Sobrescribir sin preguntar
             `-i "${voicePath}"`,
             `-i "${musicPath}"`,
+            `-f lavfi -i "anoisesrc=c=pink:d=0.5:a=1.0,afade=t=out:st=0.1:d=0.4"`, // Diseño sonoro de impacto sintético en 0.0s
             `-filter_complex "${filterComplex}"`,
             '-map "[final]"',
             '-c:a libmp3lame',

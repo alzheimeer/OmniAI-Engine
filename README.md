@@ -213,6 +213,11 @@ Para Asistentes de IA y mantenedores, consulta `CLAUDE.md` y `GEMINI.md` en el d
 - ✅ **Sanitización de Etiquetas (Tags):** Las etiquetas de YouTube se limpian para eliminar caracteres inválidos (`<`, `>`, etc.).
 - ✅ **Estadísticas de Base de Datos:** Nuevo método `getStats()` para métricas de contenido agregadas.
 - ✅ **Monitoreo de Almacenamiento:** Monitoreo asíncrono y automatizado del espacio en disco para prevenir fallas en la descarga de contenido.
+- ✅ **Evasión de Detección y Retención Extrema:**
+  - **Estrategia Híbrida:** 1 de cada 5 videos se publican como "Privado" (`YouTubePublisher`) para forzar intervención manual y evadir el "shadowban de API".
+  - **Fatiga Semántica Rota:** Títulos cortos (< 8 palabras), Personas dinámicas, prohibición de frases cliché de IA y guiones Multi-Voz.
+  - **Zero-Silence y Máscara TTS:** Uso de `silenceremove` de FFmpeg y mutación de tiempo (`atempo=1.02`) aleatoria.
+  - **Hook Hipnótico (3s):** Se inyecta un *strobing* de alto contraste los primeros 3s junto con un impacto sonoro de ruido sintético (`anoisesrc`) para maximizar la retención inicial.
 
 ## Arquitectura
 
