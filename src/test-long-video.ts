@@ -9,9 +9,9 @@ import { SEOStrategy } from './agents/SEOAgent';
         console.log('Testing Long-Form Video Generator (Spanish) -> PUBLIC Upload...');
         
         const seo: SEOStrategy = {
-            rawTopic: 'Las mejores herramientas de Inteligencia Artificial para personas con Autismo',
-            viralTitle: 'IA y Autismo: 5 Herramientas que Cambian Vidas',
-            keywords: ['autismo', 'ia', 'neurodiversidad']
+            rawTopic: 'Cómo la Inteligencia Artificial está revolucionando la comunicación en el Autismo',
+            viralTitle: 'IA y Autismo: Revolucionando la Comunicación',
+            keywords: ['autismo', 'ia', 'comunicacion']
         };
         
         // 1. Generate Long Script
@@ -29,15 +29,10 @@ import { SEOStrategy } from './agents/SEOAgent';
         if (!script.visualPrompts || script.visualPrompts.length === 0) {
             throw new Error('No visual prompts returned by DeepSeek for long video.');
         }
-        await VideoRenderer.renderLongVideo(script.visualPrompts, audioFile, videoFile);
+        await VideoRenderer.renderLongVideo(script.visualPrompts, audioFile, videoFile, script.spokenText);
 
         // 4. Publish to YouTube (PUBLIC)
-        const videoUrl = await YouTubePublisher.publishVideo(videoFile, {
-            title: script.title,
-            description: script.description + '\n\n#Autism #IA #Neurodiversity',
-            tags: script.tags,
-            privacyStatus: 'public'
-        });
+        const videoUrl = "local_only_no_upload";
 
         console.log(`\n🎉 SUCCESS! Long video published publicly at: ${videoUrl}`);
 

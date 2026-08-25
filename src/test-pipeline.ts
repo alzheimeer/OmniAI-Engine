@@ -11,9 +11,9 @@ import { SEOStrategy } from './agents/SEOAgent';
         console.log('==================================================\n');
 
         const seo: SEOStrategy = {
-            rawTopic: 'Por qué el hiperfoco autista es la mejor habilidad para programar IA',
-            viralTitle: 'Hiperfoco Autista: La Habilidad Secreta en la Era de la IA',
-            keywords: ['autismo', 'hiperfoco', 'ia', 'programacion']
+            rawTopic: '3 Mitos sobre el Autismo y la Inteligencia Artificial',
+            viralTitle: '3 Mitos sobre IA y Autismo',
+            keywords: ['autismo', 'ia', 'mitos']
         };
 
         // 1. Generar Guion con DeepSeek
@@ -32,18 +32,12 @@ import { SEOStrategy } from './agents/SEOAgent';
         console.log('🎥 PASO 3: Buscando video de fondo y renderizando...');
         const videoFile = 'final-short.mp4';
         // Usamos el primer prompt visual que nos dio DeepSeek, o un fallback
-        const visualPrompt = script.visualPrompts[0] || 'futuristic technology'; 
-        await VideoRenderer.renderVideo(visualPrompt, audioFile, videoFile);
+        await VideoRenderer.renderVideo(script.visualPrompts, audioFile, videoFile, script.spokenText);
         console.log('✅ Video final renderizado correctamente!\n');
 
         // 4. Subir a YouTube (como PRIVADO para no asustar a los suscriptores todavía)
-        console.log('📤 PASO 4: Subiendo video a YouTube...');
-        const youtubeUrl = await YouTubePublisher.publishVideo(videoFile, {
-            title: script.title,
-            description: script.description + '\n\n#Autism #AI #Neurodiversity',
-            tags: script.tags,
-            privacyStatus: 'private' // ¡Privado por ahora para revisar que todo esté bien!
-        });
+        console.log('📤 PASO 4: Omitiendo subida a YouTube para la prueba local...');
+        const youtubeUrl = "local_only_no_upload";
         
         console.log('\n==================================================');
         console.log('🎉 ¡FLUJO COMPLETO TERMINADO CON ÉXITO! 🎉');

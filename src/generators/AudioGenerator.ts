@@ -33,62 +33,78 @@ export class AudioGenerator {
         }
 
         let languageCode = 'es-ES';
-        let voiceName = '';
+        let voiceNameA = '';
+        let voiceNameB = '';
 
         if (language.toLowerCase() === 'english') {
             languageCode = 'en-US';
-            const enVoices = ['en-US-Neural2-F', 'en-US-Neural2-J', 'en-US-Chirp-HD-D', 'en-US-Studio-Q'];
-            voiceName = enVoices[Math.floor(Math.random() * enVoices.length)];
+            voiceNameA = 'en-US-Neural2-F'; // Female
+            voiceNameB = 'en-US-Neural2-J'; // Male
         } else if (language.toLowerCase() === 'portuguese') {
             languageCode = 'pt-BR';
-            const ptVoices = ['pt-BR-Wavenet-B', 'pt-BR-Neural2-B', 'pt-BR-Neural2-C'];
-            voiceName = ptVoices[Math.floor(Math.random() * ptVoices.length)];
+            voiceNameA = 'pt-BR-Neural2-C'; // Female
+            voiceNameB = 'pt-BR-Neural2-B'; // Male
         } else {
             // Default to Spanish
             languageCode = 'es-ES';
-            const esVoices = ['es-ES-Journey-D', 'es-ES-Neural2-F', 'es-ES-Chirp-HD-D', 'es-ES-Chirp-HD-O'];
-            voiceName = esVoices[Math.floor(Math.random() * esVoices.length)];
+            voiceNameA = 'es-ES-Neural2-F'; // Female
+            voiceNameB = 'es-ES-Journey-D'; // Male
         }
         
-        logger.info(`Voz TTS seleccionada aleatoriamente: ${voiceName} (${languageCode})`);
+        logger.info(`Voces TTS seleccionadas: A=${voiceNameA}, B=${voiceNameB} (${languageCode})`);
 
         const tts = google.texttospeech({ version: 'v1', auth: apiKey });
         const contentDir = path.join(__dirname, '../../content');
         const outPath = path.join(contentDir, outputFilename);
 
-        // Check if text exceeds TTS limit and needs chunking
-        const textBytes = Buffer.byteLength(text, 'utf8');
-        
         try {
-            if (textBytes <= this.MAX_CHUNK_BYTES) {
-                // Short text - single TTS call
-                logger.info(`Generando audio con Google TTS`, { language, voiceName, textBytes });
-                await this.synthesizeToFile(tts, text, voiceName, languageCode, outPath);
-            } else {
-                // Long text - chunk, synthesize each, concatenate
-                logger.warn(`Texto excede límite TTS, dividiendo en chunks`, { textBytes, maxBytes: this.MAX_CHUNK_BYTES });
-                const chunks = this.splitTextIntoChunks(text);
-                logger.info(`Texto dividido en ${chunks.length} chunks para síntesis`);
-
-                const chunkFiles: string[] = [];
+            // Parse text for [VOICE_A] and [VOICE_B]
+            const segments = text.split(/(?=\[VOICE_[AB]\]:?)/g).filter(s => s.trim().length > 0);
+            const chunkFiles: string[] = [];
+            
+            let chunkIndex = 0;
+            
+            for (let i = 0; i < segments.length; i++) {
+                let segmentText = segments[i].trim();
+                let currentVoice = voiceNameA; // Default to Voice A
                 
-                for (let i = 0; i < chunks.length; i++) {
-                    const chunkFile = path.join(contentDir, `_chunk_${i}_${outputFilename}`);
-                    logger.debug(`Sintetizando chunk ${i + 1}/${chunks.length}`, { bytes: Buffer.byteLength(chunks[i], 'utf8') });
-                    await this.synthesizeToFile(tts, chunks[i], voiceName, languageCode, chunkFile);
+                if (segmentText.startsWith('[VOICE_B]')) {
+                    currentVoice = voiceNameB;
+                    segmentText = segmentText.replace(/^\[VOICE_B\]:?\s*/i, '');
+                } else if (segmentText.startsWith('[VOICE_A]')) {
+                    currentVoice = voiceNameA;
+                    segmentText = segmentText.replace(/^\[VOICE_A\]:?\s*/i, '');
+                }
+                
+                if (!segmentText) continue;
+
+                // Check if segment itself exceeds TTS limit and needs chunking
+                const textBytes = Buffer.byteLength(segmentText, 'utf8');
+                
+                if (textBytes <= this.MAX_CHUNK_BYTES) {
+                    const chunkFile = path.join(contentDir, `_chunk_${chunkIndex++}_${outputFilename}`);
+                    logger.debug(`Sintetizando segment ${i + 1}/${segments.length}`, { bytes: textBytes, voice: currentVoice });
+                    await this.synthesizeToFile(tts, segmentText, currentVoice, languageCode, chunkFile);
                     chunkFiles.push(chunkFile);
+                } else {
+                    const chunks = this.splitTextIntoChunks(segmentText);
+                    for (const chunk of chunks) {
+                        const chunkFile = path.join(contentDir, `_chunk_${chunkIndex++}_${outputFilename}`);
+                        await this.synthesizeToFile(tts, chunk, currentVoice, languageCode, chunkFile);
+                        chunkFiles.push(chunkFile);
+                    }
                 }
-
-                // Concatenate all chunks with FFmpeg
-                logger.info(`Concatenando ${chunks.length} chunks de audio con FFmpeg`);
-                await this.concatenateAudioFiles(chunkFiles, outPath, contentDir);
-
-                // Cleanup chunk files
-                for (const chunkFile of chunkFiles) {
-                    try { fs.unlinkSync(chunkFile); } catch {}
-                }
-                logger.debug(`Limpiados ${chunkFiles.length} archivos temporales de chunks`);
             }
+
+            // Concatenate all chunks with FFmpeg
+            logger.info(`Concatenando ${chunkFiles.length} chunks de audio con FFmpeg`);
+            await this.concatenateAudioFiles(chunkFiles, outPath, contentDir);
+
+            // Cleanup chunk files
+            for (const chunkFile of chunkFiles) {
+                try { fs.unlinkSync(chunkFile); } catch {}
+            }
+            logger.debug(`Limpiados ${chunkFiles.length} archivos temporales de chunks`);
             
             // Post-processing to apply silenceremove and occasional masking
             const finalOutPath = outPath.replace('.mp3', '_filtered.mp3');

@@ -182,8 +182,7 @@ export class AutonomousOrchestrator {
 
             await AudioGenerator.generateAudio(script.spokenText, audioFile, language);
             
-            const visualPrompt = script.visualPrompts[0] || 'technology data';
-            await VideoRenderer.renderVideo(visualPrompt, audioFile, videoFile);
+            await VideoRenderer.renderVideo(script.visualPrompts, audioFile, videoFile, script.spokenText);
 
             const videoDuration = await this.getVideoDuration(path.join(__dirname, '../../content', videoFile));
 
@@ -323,7 +322,7 @@ export class AutonomousOrchestrator {
                 script.visualPrompts = [seo.viralTitle, 'technology workplace', 'artificial intelligence future', 'neurodiversity success'];
             }
 
-            await VideoRenderer.renderLongVideo(script.visualPrompts, audioFile, videoFile);
+            await VideoRenderer.renderLongVideo(script.visualPrompts, audioFile, videoFile, script.spokenText);
 
             const videoDuration = await this.getVideoDuration(path.join(__dirname, '../../content', videoFile));
 

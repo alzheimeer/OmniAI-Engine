@@ -69,7 +69,7 @@ The JSON must have this exact structure:
   "tags": ["autism", "ai", "neurodiversity", "tech", "etc"],
   "hook": "The exact words for the first 3 seconds - must grab attention IMMEDIATELY",
   "spokenText": "The REST of the script AFTER the hook. The hook will be prepended automatically. Keep it punchy, conversational, no emojis, around 130-140 words.",
-  "visualPrompts": ["A description of what should be on screen for sentence 1", "Visual description 2", "etc"]
+  "visualPrompts": ["CRITICAL: 1 to 3 words ONLY, general stock video keywords (e.g., 'technology', 'neon brain', 'sad boy')", "abstract data", "coding screen"]
 }`;
 
         try {
@@ -155,9 +155,9 @@ The JSON must have this exact structure:
         const duration = seo.targetDurationMinutes || 5;
         const words = seo.wordCountRange || "600-900";
 
-        const isMultiVoice = Math.random() < 0.25;
+        const isMultiVoice = Math.random() < 0.75;
         const voiceInstruction = isMultiVoice 
-            ? `\nCRITICAL (MULTI-VOICE FORMAT): Write this script as a dynamic podcast-style interview or a conversational dialogue between two people. This breaks semantic fatigue.`
+            ? `\nCRITICAL (MULTI-VOICE FORMAT): Write this script as a dynamic podcast-style interview or a conversational dialogue between two people. YOU MUST prefix every spoken paragraph with either [VOICE_A]: or [VOICE_B]: to indicate who is speaking. Example: "[VOICE_A]: Did you know that...? [VOICE_B]: Wow, really?". This is mandatory to break semantic fatigue.`
             : ``;
 
         const systemPrompt = `You are a viral YouTube documentary scriptwriter for a channel called "${channelName}". 
@@ -185,8 +185,8 @@ The JSON must have this exact structure:
   "description": "A detailed SEO optimized description with key points mentioned",
   "tags": ["autism", "ai", "neurodiversity", "tech", "etc"],
   "hook": "The exact words for the first 10 seconds - must grab attention",
-  "spokenText": "The entire script text for the voiceover (1200-1500 words). Keep it engaging, educational, and professional.",
-  "visualPrompts": ["Visual 1", "Visual 2", "Visual 3", "Visual 4", "Visual 5", "Visual 6", "Visual 7", "Visual 8", "Visual 9", "Visual 10"],
+  "spokenText": "The entire script text for the voiceover (1200-1500 words). MUST start with the hook. Keep it engaging, educational, and professional.",
+  "visualPrompts": ["CRITICAL: 1 to 3 words ONLY, general stock video keywords (e.g., 'technology', 'neon brain', 'sad boy')", "abstract data", "coding screen", "happy family", "office", "robot", "light bulb", "medical", "future", "brain"],
   "chapters": [
     {"time": "0:00", "title": "Introduction"},
     {"time": "1:30", "title": "Point 1"},
@@ -216,10 +216,8 @@ The JSON must have this exact structure:
             
             const scriptData = JSON.parse(cleanJson) as VideoScript;
             
-            // Combine hook with spoken text for final script
-            if (scriptData.hook && scriptData.spokenText) {
-                scriptData.spokenText = `${scriptData.hook} ${scriptData.spokenText}`;
-            }
+            // Note: We do NOT prepend the hook here for long videos,
+            // because the prompt explicitly tells the LLM to start spokenText with it.
             
             // Add chapters to description for YouTube timestamps feature
             if (scriptData.chapters && scriptData.chapters.length > 0) {
