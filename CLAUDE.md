@@ -179,6 +179,16 @@ Auditoría SEO completa documentada en `docs/AUDITORIA-SEO-YOUTUBE.md`.
 3. **Máscara TTS y Zero-Silence:** Uso de `silenceremove` en `AudioGenerator` para cortar milisegundos muertos al inicio. El 25% de los audios reciben `atempo=1.02` para desdibujar la firma acústica de Google TTS.
 4. **Impacto Máximo (Hook):** `AudioMixer` inyecta ruido rosa filtrado (`anoisesrc`) como impacto en el segundo 0.0. `VideoRenderer` aplica un filtro `eq` estroboscópico de contraste/brillo durante los primeros 3 segundos de cualquier video.
 
+### Retención Visual Neurodivergente y Prevención de Repetición (NUEVO - Agosto 2026)
+
+**Problemas resueltos:** Subtítulos aburridos que restaban retención, falta de estilo visual enfocado al nicho (Autismo) y videos de archivo (Pexels) que se repetían en ejecuciones continuas, además de un bug que duplicaba el gancho inicial en videos largos.
+
+**Solución implementada:**
+1. **Subtítulos ASS Estrictos (SEO):** Se amplió masivamente el filtro `stopWords` de `SubtitleGenerator` para ignorar verbos conectores y pronombres. Se agregaron colores dinámicos (Magenta, Cian, Verde, Naranja) y animaciones fluidas (Zoom-in, rotaciones, Star Wars) solo a las palabras clave importantes.
+2. **Filtros Sensoriales:** En `VideoRenderer`, FFmpeg ahora inyecta `chromashift=cbh=-2:crh=2` (aberración cromática) y elevaciones en saturación/contraste para crear una perspectiva de sobrecarga sensorial visual adecuada para el tema del autismo.
+3. **Pexels Anti-Reuse Engine:** `VideoRenderer` mantiene una caché de los últimos 100 clips usados (`content/cache/used_pexels_videos.json`) e incrementa el request de búsqueda a `per_page=15`, escaneando los clips devueltos hasta encontrar uno virgen, lo que previene la fatiga visual por reutilización extrema.
+4. **Fix Hooks Largos:** El `ScriptGenerator` ya no fuerza la pre-concatenación del gancho en el texto devuelto por el LLM en videos largos, evitando repetición del saludo.
+
 ### Sistema de Deduplicación de Temas (NUEVO - Agosto 2026)
 
 **Problema resuelto:** Con un nicho específico (Autismo + IA), el LLM podía generar temas repetidos después de muchos videos.

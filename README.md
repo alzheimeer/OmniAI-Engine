@@ -218,6 +218,11 @@ Para Asistentes de IA y mantenedores, consulta `CLAUDE.md` y `GEMINI.md` en el d
   - **Fatiga Semántica Rota:** Títulos cortos (< 8 palabras), Personas dinámicas, prohibición de frases cliché de IA y guiones Multi-Voz.
   - **Zero-Silence y Máscara TTS:** Uso de `silenceremove` de FFmpeg y mutación de tiempo (`atempo=1.02`) aleatoria.
   - **Hook Hipnótico (3s):** Se inyecta un *strobing* de alto contraste los primeros 3s junto con un impacto sonoro de ruido sintético (`anoisesrc`) para maximizar la retención inicial.
+- ✅ **Retención Visual Neurodivergente y Anti-Repetición:**
+  - **Filtros Sensoriales FFmpeg:** Uso de aberración cromática (`chromashift`) y alto contraste para emular sobrecarga/intensidad sensorial alineado al nicho de Autismo.
+  - **Subtítulos ASS con SEO Estricto:** Eliminación de verbos conectores ("estar", "fue", etc.) en los resaltados; aplicando colores dinámicos (Magenta, Cian, Verde, Naranja) y micro-animaciones hiperactivas.
+  - **Pexels Anti-Reuse Engine:** Memoria de los últimos 100 clips de stock (`used_pexels_videos.json`) e incremento de cuota de búsqueda (`per_page=15`) para garantizar material visual inédito continuo.
+  - **Sanitización de Scripts:** Supresión de *hooks* dobles redundantes en la generación de documentales largos.
 
 ## Arquitectura
 

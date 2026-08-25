@@ -103,3 +103,8 @@ Implementación exhaustiva según spec `omniai-v2-optimization`, enfocada en eva
    - Inyección de Personas, Títulos de 8 palabras, y formato Multi-Voz para evadir fatiga semántica de los LLMs.
    - Máscara TTS con `silenceremove` y `atempo=1.02` para ofuscar firmas acústicas.
    - Hook visual epiléptico (3s de strobing) e impacto sonoro sintético en el segundo 0.0 para maximizar retención (Shorts y Largos).
+8. **Retención Visual Neurodivergente y Prevención de Repetición (NUEVO):**
+   - **Filtros FFmpeg Sensoriales:** Uso de aberración cromática (`chromashift`) y contrastes altos en la renderización de los videos para asimilarse al nicho neurodivergente.
+   - **Subtítulos ASS Estrictos:** Filtrado masivo de "stopWords" en el guion, para que los subtítulos destaquen solo términos valiosos con múltiples colores vivos y micro-animaciones hiperactivas.
+   - **Pexels Anti-Reuse Engine:** Registro en caché de los últimos 100 clips Pexels usados para diversificar las tomas solicitando lotes más grandes (`per_page=15`).
+   - **Fix Hook Largo:** Corrección en el generador de guiones para suprimir duplicaciones molestas del saludo de bienvenida.
