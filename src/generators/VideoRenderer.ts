@@ -26,6 +26,69 @@ export class VideoRenderer {
         'Accept': 'application/json, text/plain, */*'
     };
 
+    private static readonly PEXELS_USED_VIDEOS_CACHE = path.join(__dirname, '../../content/cache/used_pexels_videos.json');
+
+    private static loadUsedVideos(): number[] {
+        try {
+            if (fs.existsSync(this.PEXELS_USED_VIDEOS_CACHE)) {
+                return JSON.parse(fs.readFileSync(this.PEXELS_USED_VIDEOS_CACHE, 'utf-8'));
+            }
+        } catch (e: any) {
+            logger.warn('Error loading used pexels videos cache', { error: e.message });
+        }
+        return [];
+    }
+
+    private static saveUsedVideo(id: number) {
+        const MAX_HISTORY = 100;
+        const used = this.loadUsedVideos();
+        const index = used.indexOf(id);
+        if (index > -1) {
+            used.splice(index, 1);
+        }
+        used.push(id);
+        if (used.length > MAX_HISTORY) {
+            used.shift(); // remove oldest
+        }
+        try {
+            const dir = path.dirname(this.PEXELS_USED_VIDEOS_CACHE);
+            if (!fs.existsSync(dir)) {
+                fs.mkdirSync(dir, { recursive: true });
+            }
+            fs.writeFileSync(this.PEXELS_USED_VIDEOS_CACHE, JSON.stringify(used));
+        } catch (e: any) {
+            logger.warn('Error saving used pexels videos cache', { error: e.message });
+        }
+    }
+
+    private static getUnusedVideo(videos: any[]): any {
+        if (!videos || videos.length === 0) return null;
+        const used = this.loadUsedVideos();
+        
+        const unusedVideos = videos.filter(v => !used.includes(v.id));
+        
+        if (unusedVideos.length > 0) {
+            this.saveUsedVideo(unusedVideos[0].id);
+            logger.info('Seleccionando video Pexels no utilizado', { videoId: unusedVideos[0].id });
+            return unusedVideos[0];
+        }
+        
+        let oldestVideo = videos[0];
+        let oldestIndex = used.length;
+        
+        for (const v of videos) {
+            const idx = used.indexOf(v.id);
+            if (idx > -1 && idx < oldestIndex) {
+                oldestIndex = idx;
+                oldestVideo = v;
+            }
+        }
+        
+        this.saveUsedVideo(oldestVideo.id);
+        logger.warn('Todos los videos fueron utilizados, reciclando el más antiguo', { videoId: oldestVideo.id });
+        return oldestVideo;
+    }
+
     /**
      * Finds a stock video on Pexels, downloads it, and merges it with the generated audio for Shorts.
      * @param visualPrompt A search term for the background video (e.g., "coding office")
@@ -65,19 +128,20 @@ export class VideoRenderer {
             
             try {
                 let response = await pexelsRetry.execute(
-                    () => axios.get(`https://api.pexels.com/videos/search?query=${encodeURIComponent(prompt)}&orientation=portrait&per_page=1`, { headers }),
+                    () => axios.get(`https://api.pexels.com/videos/search?query=${encodeURIComponent(prompt)}&orientation=portrait&per_page=15`, { headers }),
                     `Pexels search short scene ${i + 1}`
                 );
 
                 if (!response.data.videos || response.data.videos.length === 0) {
                     response = await pexelsRetry.execute(
-                        () => axios.get(`https://api.pexels.com/videos/search?query=technology&orientation=portrait&per_page=1`, { headers }),
+                        () => axios.get(`https://api.pexels.com/videos/search?query=technology&orientation=portrait&per_page=15`, { headers }),
                         `Pexels fallback search short scene ${i + 1}`
                     );
                 }
 
                 if (response.data.videos && response.data.videos.length > 0) {
-                    const videoData = response.data.videos[0];
+                    const videoData = this.getUnusedVideo(response.data.videos);
+                    if (!videoData) throw new Error('No Pexels video found');
                     const videoFile = videoData.video_files.find((v: any) => v.height >= 1080) || videoData.video_files[0];
                     const writer = fs.createWriteStream(tempVideoPath);
                     const downloadResponse = await pexelsRetry.execute(
@@ -181,20 +245,21 @@ export class VideoRenderer {
                 try {
                     // REQ-4.4.2: Aplicar retry con backoff exponencial a llamadas Pexels
                     let response = await pexelsRetry.execute(
-                        () => axios.get(`https://api.pexels.com/videos/search?query=${encodeURIComponent(prompt)}&orientation=landscape&per_page=1`, { headers }),
+                        () => axios.get(`https://api.pexels.com/videos/search?query=${encodeURIComponent(prompt)}&orientation=landscape&per_page=15`, { headers }),
                         `Pexels search scene ${i + 1} (${prompt})`
                     );
 
                     if (!response.data.videos || response.data.videos.length === 0) {
                         logger.warn(`No se encontraron videos para escena ${i + 1}, usando fallback`, { prompt, fallbackPrompt: 'futuristic tech' });
                         response = await pexelsRetry.execute(
-                            () => axios.get(`https://api.pexels.com/videos/search?query=${encodeURIComponent('futuristic tech')}&orientation=landscape&per_page=1`, { headers }),
+                            () => axios.get(`https://api.pexels.com/videos/search?query=${encodeURIComponent('futuristic tech')}&orientation=landscape&per_page=15`, { headers }),
                             `Pexels search scene ${i + 1} (fallback: futuristic tech)`
                         );
                     }
 
                     if (response.data.videos && response.data.videos.length > 0) {
-                        const videoData = response.data.videos[0];
+                        const videoData = this.getUnusedVideo(response.data.videos);
+                        if (!videoData) throw new Error('No Pexels video found');
                         const videoFile = videoData.video_files.find((v: any) => v.height >= 720) || videoData.video_files[0];
                         const videoUrl = videoFile.link;
 
