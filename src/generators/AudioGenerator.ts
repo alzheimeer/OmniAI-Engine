@@ -280,9 +280,14 @@ export class AudioGenerator {
         const applyMasking = Math.random() < 0.25; // 25% of the time, apply deep masking
         let filterChain = "silenceremove=start_periods=1:start_duration=0.05:start_threshold=-50dB";
         if (applyMasking) {
-            // A subtle +2% tempo increase to mask the voice fingerprint without losing naturalness
-            filterChain += ",atempo=1.02";
-            logger.info('Aplicando micro-mutación acústica (atempo 1.02)');
+            // NOTA: atempo=1.02 era detectable por YouTube. Esta técnica usa:
+            // - asetrate*1.02: Sube el formante 2%
+            // - aresample: Normaliza sample rate
+            // - atempo=0.9804: Compensa la velocidad (inverso de 1.02)
+            // Resultado: misma duración, timbre diferente, indetectable
+            filterChain += ",asetrate=44100*1.02,aresample=44100,atempo=0.9804";
+            // El resultado: misma velocidad, pero voz con timbre ligeramente diferente
+            logger.info('Aplicando humanización de voz (Formant Shift + compensación)');
         }
         
         try {

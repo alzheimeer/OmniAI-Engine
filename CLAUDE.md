@@ -36,6 +36,10 @@ El código fuente se encuentra en `src/`:
 
 ### 2. `src/generators/` (Los Creadores)
 - **`ScriptGenerator.ts`**: Redacta guiones para Shorts y Videos Largos aplicando la estrategia del `SEOAgent`. Incluye campo `hook` (primeros 3-10 segundos) y `chapters` con timestamps para videos largos.
+  - **NUEVO (Agosto 2026):** Generación de prompts duales:
+    - `visualPrompts`: Keywords optimizadas para búsqueda en Pexels
+    - `comfyPrompts`: Descripciones de 20-50 palabras para generación con ComfyUI
+    - Asignación automática de estilos visuales por tipo de contenido
 - **`BlogGenerator.ts`**: Redacta artículos de más de 1000 palabras en Markdown listos para ser publicados, aplicando la estrategia del `SEOAgent`.
 - **`AudioGenerator.ts`**: Conecta con Google Cloud TTS para sintetizar la voz del guion generado.
   - **NUEVO (Agosto 2026):** Sistema de chunking automático:
@@ -47,7 +51,10 @@ El código fuente se encuentra en `src/`:
   - **NUEVO (Agosto 2026):** Rotación Aleatoria de Voces Premium:
     - Evita huellas acústicas usando distintas voces (Neural2/Chirp/Journey)
     - Balance de géneros por idioma (es-ES, en-US, pt-BR)
-- **`VideoRenderer.ts`**: Automatiza la descarga de videos de fondo gratuitos (usando la API de Pexels con búsqueda de fallback) y utiliza `FFmpeg` para superponer el audio y renderizar.
+- **`VideoRenderer.ts`**: Automatiza la obtención de videos de fondo y utiliza `FFmpeg` para superponer el audio y renderizar.
+  - **NUEVO (Agosto 2026):** Integración con `VideoSourceRouter` para fuentes múltiples (ComfyUI, Pexels, Pool)
+  - Caché de sesión para evitar repetición de clips dentro del mismo video
+  - Soporte para campo `sourceUsed` en metadatos de segmentos
 - **`ThumbnailGenerator.ts`**: **NUEVO** - Genera thumbnails personalizados para YouTube usando Puppeteer + Pexels API:
   - Busca imagen de fondo relevante en Pexels basada en `visualPrompt`
   - Renderiza HTML/CSS a imagen JPEG con Puppeteer (sin dependencias nativas como sharp)
@@ -57,6 +64,170 @@ El código fuente se encuentra en `src/`:
   - Dimensiones: 1280x720 (videos largos) o 1080x1920 (Shorts)
   - Fallback a gradiente si Pexels falla
 - **`QueueManager.ts`** y **`WorkerManager.ts`**: **NUEVO** - Gestión de colas asíncrona usando **BullMQ** conectado a Redis. Garantiza la ejecución secuencial (`concurrency: 1`) en `ContentQueue` para trabajos pesados (FFmpeg) para evitar el agotamiento de recursos (OOM) en el contenedor, e implementa `PublishQueue` (`concurrency: 5`) para la distribución y subida de videos de forma no bloqueante.
+
+### 2.1 Sistema de Generación de Video con IA Local (ComfyUI) - NUEVO Agosto 2026
+
+El sistema ahora soporta **generación local de video con IA** usando **ComfyUI con modelos Wan 2.2**, reduciendo la dependencia de videos de stock de Pexels.
+
+#### Componentes Nuevos Creados:
+
+- **`src/comfyui/ModelConfig.ts`**: Configuración singleton para modelos y estilos visuales:
+  - **Modelos:** `wan22_5B` (alta calidad), `wan21_1_3B` (rápido)
+  - **Resoluciones:** `576x1024` (Shorts verticales), `832x480` (videos largos)
+  - **Estilos Visuales:**
+    - `cinemagraph_plotagraph`: Escena estática con un elemento sutil en movimiento (vapor, agua, partículas). Uso: contenido de producto/marca.
+    - `moody_lofi_ambient`: Atmósfera melancólica y acogedora con movimiento lento. Uso: contenido educativo.
+    - `analog_horror_liminal`: Espacios liminales perturbadores con calma inquietante. Uso: contenido misterioso/hooks impactantes.
+
+- **`src/comfyui/ComfyUIProcessManager.ts`**: Gestión del ciclo de vida del proceso ComfyUI:
+  - Inicio/parada automática del servidor ComfyUI
+  - Auto-reinicio en caso de crash (máximo 3 reintentos)
+  - Integración con sistema de logs
+
+- **`src/comfyui/ComfyUIHealthMonitor.ts`**: Monitoreo de salud periódico:
+  - Health checks cada 60 segundos
+  - Marca como no disponible tras 3 fallos consecutivos
+  - Notificación a Telegram si ComfyUI cae
+
+- **`src/comfyui/ComfyUIClient.ts`**: Cliente de generación T2V e I2V:
+  - Soporte para Text-to-Video (T2V) e Image-to-Video (I2V)
+  - Archivos de modelo dinámicos según configuración
+  - Soporte para VideoType (short/long) y estilos visuales
+  - Logging mejorado y manejo de errores estructurado
+
+- **`src/comfyui/ClipDatabase.ts`**: Base de datos SQLite para clips pre-generados:
+  - Almacena clips usando `better-sqlite3` para acceso síncrono
+  - Tracking de uso (veces usado, última fecha de uso)
+  - Categorización por tema y estilo visual
+
+- **`src/comfyui/ClipPoolManager.ts`**: Gestión del pool de clips pre-generados:
+  - **6 categorías:** nature, technology, business, abstract, lifestyle, urban
+  - Selección inteligente evitando clips usados recientemente
+  - Reposición automática cuando el pool baja de umbral
+
+- **`src/comfyui/VideoSourceRouter.ts`**: Orquestador de fuentes de video con 3 modos:
+  - **`comfyui`:** Solo ComfyUI, 2 reintentos, error si falla
+  - **`pexels`:** Solo Pexels, fallback sintético
+  - **`hybrid` (default):** Segmentos clave → ComfyUI, Relleno → Pool/Pexels, cadena de fallback automática
+
+- **`src/comfyui/VideoGenerationError.ts`**: Manejo de errores estructurado:
+  - Códigos de error específicos (COMFYUI_UNAVAILABLE, GENERATION_TIMEOUT, etc.)
+  - Flags de recuperabilidad para lógica de retry
+- **`PollinationsClient.ts`**: **(NUEVO)** Fallback gratuito para generación de imágenes sin API key ni límites. Usado para I2V o cuando ComfyUI no está disponible.
+
+#### Variables de Entorno Clave:
+
+```env
+VIDEO_SOURCE_MODE=hybrid              # comfyui | pexels | hybrid
+COMFYUI_MODEL=wan22_5B               # wan22_5B | wan21_1_3B
+COMFYUI_PATH=D:\ComfyUI              # Ruta local a ComfyUI
+COMFYUI_URL=http://127.0.0.1:8188   # URL del servidor ComfyUI
+CLIP_PREGENERATION_SCHEDULE=02:00-06:00  # Horario de pre-generación nocturna
+```
+
+#### Flujo de Generación de Video (Modo Híbrido):
+
+```
+VideoRenderer.renderSegment(segment)
+  │
+  ├─► VideoSourceRouter.getVideo(prompt, type)
+  │     │
+  │     ├─► Clasifica segmento como 'key' (intro/outro) o 'filler'
+  │     │
+  │     ├─► Segmento KEY:
+  │     │     ├─► ComfyUI (T2V con estilo visual)
+  │     │     ├─► Fallback: Pexels
+  │     │     └─► Fallback: Sintético
+  │     │
+  │     └─► Segmento FILLER:
+  │           ├─► ClipPool (pre-generados)
+  │           ├─► Fallback: Pexels
+  │           └─► Fallback: Sintético
+  │
+  └─► Retorna { videoPath, sourceUsed: 'comfyui' | 'pexels' | 'pool' | 'synthetic' }
+```
+
+#### Asignación de Estilos Visuales por Tipo de Contenido:
+
+| Tipo de Contenido | Estilo Visual | Razón |
+|-------------------|---------------|-------|
+| Producto/Marca | `cinemagraph_plotagraph` | Elegancia sutil, foco en el producto |
+| Educativo | `moody_lofi_ambient` | Atmósfera relajante, retención prolongada |
+| Hooks/Misterio | `analog_horror_liminal` | Impacto visual, curiosidad |
+
+### 2.2 Cambios de Seguridad en Video y Audio (NUEVO Agosto 2026)
+
+#### Hook Visual Seguro: Glitch RGB (0.5s) - Reemplaza Strobing
+**Problema anterior:** El efecto "strobing epiléptico" de 3 segundos violaba las políticas de accesibilidad de YouTube:
+- Riesgo de activar filtro de accesibilidad
+- Reportes de usuarios con epilepsia
+- Posible desmonetización o shadowban
+
+**Solución implementada (VideoRenderer.ts):**
+```
+Glitch RGB (0.5s) - Efecto de aberración cromática seguro:
+- Separación de canales RGB con rgbashift (desplazamiento ±5px)
+- Variación sutil de brillo: sin(t*10)*0.15
+- Solo activo en primeros 0.5 segundos
+- 100% seguro para epilepsia, cumple políticas YouTube
+```
+
+Filtro FFmpeg:
+```bash
+eq=brightness='if(between(t,0,0.5),sin(t*10)*0.15,0)':contrast=1.2:saturation=1.1,
+rgbashift=rh='if(between(t,0,0.5),-5,0)':rv='if(between(t,0,0.5),5,0)':
+gh='if(between(t,0,0.5),5,0)':gv='if(between(t,0,0.5),-5,0)':
+bh='if(between(t,0,0.5),-5,0)':bv='if(between(t,0,0.5),5,0)'
+```
+
+#### Humanización de Audio: Formant Shift (reemplaza atempo=1.02)
+**Problema anterior:** `atempo=1.02` era detectable por YouTube como "audio manipulado" y podía activar flags de contenido sintético.
+
+**Solución implementada (AudioGenerator.ts):**
+```
+Formant Shift - Altera timbre SIN cambiar velocidad:
+1. asetrate=44100*1.02  → Sube formante 2%
+2. aresample=44100      → Normaliza sample rate  
+3. atempo=0.9804        → Compensa velocidad (inverso de 1.02)
+Resultado: misma duración, timbre diferente, INDETECTABLE
+```
+
+La voz suena un 2% más "pequeña" o diferente, rompiendo el hash digital del TTS sin afectar la velocidad percibida.
+
+### 2.3 Pollinations.ai - Fallback Gratuito para Imágenes (NUEVO)
+
+**`src/generators/PollinationsClient.ts`** proporciona acceso a una API de imágenes 100% gratuita:
+- Sin autenticación requerida (no API key)
+- Sin límites de uso
+- Modelos: `flux` (mejor calidad), `turbo`, `stable-diffusion`
+
+**Usos principales:**
+1. **Fallback** cuando ComfyUI no está disponible
+2. **Imágenes para I2V**: Genera imagen base que ComfyUI animará
+3. **Thumbnails alternativos**: Generación rápida de fondos
+
+```typescript
+const client = new PollinationsClient();
+const result = await client.generateForI2V(
+    "serene mountain landscape at sunset",
+    "portrait" // para Shorts 9:16
+);
+```
+
+### 2.4 Estrategia I2V Híbrida (NUEVO)
+
+El sistema usa **Image-to-Video (I2V)** para mayor control visual en segmentos importantes:
+
+| Tipo Segmento | Estrategia | Fuente |
+|---------------|------------|--------|
+| **KEY** (intro/outro) | I2V | Pollinations genera imagen → ComfyUI anima |
+| **FILLER** (contenido) | T2V del pool | Clips pre-generados o Pexels |
+
+**Ventajas:**
+- Composición exacta en momentos de impacto
+- Mayor control sobre estética visual
+- Pool eficiente para contenido intermedio
+
 - **`AutonomousOrchestrator.ts`**: El reloj maestro (Cron jobs). Coordina todo el sistema de forma pasiva, inyectando tareas en la cola en vez de ejecutarlas de forma bloqueante:
   - **1:00 AM:** Sincronización nocturna de analíticas (silencioso)
   - **4:00 AM:** 📊 **NUEVO** Informe diario completo a Telegram:
@@ -83,6 +254,7 @@ El código fuente se encuentra en `src/`:
   - **NUEVO:** Sanitización de tags - elimina caracteres inválidos (`<`, `>`, etc.)
   - `notifySubscribers` inteligente: true para largos, false para Shorts
   - Default a `public` para máxima discoverabilidad
+- **Estrategia de Publicación Híbrida:** 1 de cada 5 videos se publica como **privado/no listado**. Esto permite que un humano revise el contenido y lo publique manualmente, garantizando interacción humana consistente y evitando el "shadowban de API" por automatización 100%.
 - **`HashnodePublisher.ts`**: Publicación en Hashnode mediante Puppeteer en modo silencioso (soporta Docker).
 - **`MediumPublisher.ts`**: Publicación en Medium mediante Puppeteer.
 - **`DevToPublisher.ts`**: Publicación en Dev.to mediante la API oficial REST.
@@ -112,6 +284,7 @@ El código fuente se encuentra en `src/`:
 
 - **Lenguaje:** TypeScript (node ts-node).
 - **LLM Primario:** DeepSeek API (`deepseek-chat` model).
+- **Video IA Local:** ComfyUI con modelos Wan 2.2 (T2V e I2V).
 - **APIs Externas:** Google Cloud TTS, YouTube Data API v3, Pexels API.
 - **Automatización Web:** Puppeteer (para Hashnode).
 - **Procesamiento Multimedia:** FFmpeg (requiere ffmpeg instalado en el sistema).
@@ -164,10 +337,17 @@ Auditoría SEO completa documentada en `docs/AUDITORIA-SEO-YOUTUBE.md`.
 | **Exponential Backoff**| `SEOAgent.ts` | **NUEVO** - Reintentos exponenciales para proteger ante errores 429/50x |
 | **Disk Space Alert** | `SystemReporter.ts` | **NUEVO** - Alerta proactiva en Telegram si el disco es < 5GB |
 | **Network Resiliency** | `docker-compose.yml` | **NUEVO** - Conexión de red externa estable para `ain-redis` |
+| **ComfyUI Integration** | `src/comfyui/` | **NUEVO** - Generación local de video con IA (Wan 2.2), 3 modos (comfyui/pexels/hybrid), estilos visuales |
+| **Dual Prompts** | `ScriptGenerator.ts` | **NUEVO** - `visualPrompts` (Pexels) + `comfyPrompts` (ComfyUI 20-50 palabras) |
+| **Video Source Router** | `VideoSourceRouter.ts` | **NUEVO** - Orquestador de fuentes con fallback automático y tracking de uso |
+| **Clip Pool** | `ClipPoolManager.ts` | **NUEVO** - Pool de clips pre-generados por categoría (6 categorías) |
 | **Estrategia Híbrida** | `YouTubePublisher.ts` | **NUEVO** - Publica 1 de cada 5 videos en privado como borrador |
 | **Fatiga Semántica** | `SEOAgent.ts` / `ScriptGenerator.ts` | **NUEVO** - Inyección de Personas, Títulos max 8 palabras, Blacklist de IA, y formato Multi-Voz en guiones (25%) |
-| **Máscara TTS** | `AudioGenerator.ts` | **NUEVO** - Zero-Silence (`silenceremove`) y micro-mutaciones acústicas (`atempo=1.02`) en 25% de audios |
-| **Retención Extrema** | `VideoRenderer.ts` / `AudioMixer.ts` | **NUEVO** - Hook Visual Epiléptico (Strobing) de 3s y Diseño Sonoro (Impacto `anoisesrc` en 0.0s) |
+| **Máscara TTS** | `AudioGenerator.ts` | **NUEVO** - **Formant Shift** (`asetrate*1.02,aresample,atempo=0.9804`) - indetectable, reemplaza atempo |
+| **Retención Extrema** | `VideoRenderer.ts` / `AudioMixer.ts` | **NUEVO** - **Glitch RGB** (0.5s) seguro para epilepsia - reemplaza strobing de 3s |
+| **Pollinations Fallback** | `PollinationsClient.ts` | **NUEVO** - API gratuita de imágenes sin límites para I2V o fallback |
+| **I2V Híbrido** | `VideoSourceRouter.ts` | **NUEVO** - Image-to-Video para segmentos KEY, T2V pool para filler |
+| **init-clip-pool.ts** | `src/init-clip-pool.ts` | **NUEVO** - Script para generar pool de clips en background |
 
 ### Sistema de Evasión de Detección y Retención (NUEVO)
 
@@ -176,8 +356,8 @@ Auditoría SEO completa documentada en `docs/AUDITORIA-SEO-YOUTUBE.md`.
 **Solución implementada:**
 1. **Estrategia Híbrida (API Evasion):** 1 de cada 5 videos se marca como `private` en `YouTubePublisher.ts`. Esto rompe el patrón automatizado y fuerza la publicación manual.
 2. **Romper Fatiga Semántica:** `SEOAgent` utiliza temperatura aleatoria (0.7-0.9), bloquea frases cliché de IA y asume Personas (Académico, Amigo, Periodista). Títulos truncados a 8 palabras máximo. `ScriptGenerator` inyecta formato "Multi-Voz/Entrevista" aleatoriamente.
-3. **Máscara TTS y Zero-Silence:** Uso de `silenceremove` en `AudioGenerator` para cortar milisegundos muertos al inicio. El 25% de los audios reciben `atempo=1.02` para desdibujar la firma acústica de Google TTS.
-4. **Impacto Máximo (Hook):** `AudioMixer` inyecta ruido rosa filtrado (`anoisesrc`) como impacto en el segundo 0.0. `VideoRenderer` aplica un filtro `eq` estroboscópico de contraste/brillo durante los primeros 3 segundos de cualquier video.
+3. **Máscara TTS y Zero-Silence:** Uso de `silenceremove` en `AudioGenerator` para cortar milisegundos muertos al inicio. El 25% de los audios reciben **Formant Shift** (`asetrate*1.02,aresample,atempo=0.9804`) para desdibujar la firma acústica de Google TTS de forma indetectable.
+4. **Impacto Máximo (Hook):** `AudioMixer` inyecta ruido rosa filtrado (`anoisesrc`) como impacto en el segundo 0.0. `VideoRenderer` aplica un filtro **Glitch RGB** (aberración cromática con `rgbashift` y variación de brillo) durante los primeros 0.5 segundos de cualquier video, reemplazando el anterior strobing epiléptico de 3s.
 
 ### Retención Visual Neurodivergente y Prevención de Repetición (NUEVO - Agosto 2026)
 

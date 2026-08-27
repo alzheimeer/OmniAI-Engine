@@ -10,7 +10,13 @@
 import fs from 'fs';
 import path from 'path';
 import OpenAI from 'openai';
-import { WordTiming } from './SubtitleGenerator';
+
+export interface WordTiming {
+    word: string;
+    startTimeMs: number;
+    endTimeMs: number;
+    markIndex?: number;
+}
 
 // ============================================================================
 // INTERFACES

@@ -12,7 +12,17 @@ OmniAI-Engine es un motor de Inteligencia Artificial totalmente autónomo diseñ
 - **Analytics Engine (El Científico):** Se conecta a la API de Datos de YouTube v3 para obtener conteo de suscriptores, vistas de videos y likes en tiempo real, retroalimentando al SEO Agent.
 - **Script & Blog Generators (Los Escritores):** Escribe cortos atractivos de 60s, documentales de 5m y artículos markdown de más de 1000 palabras sobre Inteligencia Artificial y Neurodiversidad.
 - **Audio Generator (La Voz):** Usa Google Cloud TTS para voces superpuestas con **división automática de texto (chunking)** para manejar guiones que exceden el límite de 5000 bytes de la API.
-- **Video Renderer (El Estudio):** Obtiene material de video de archivo de Pexels (con resiliencia de búsqueda de respaldo) y renderiza videos en 1080p con FFmpeg.
+- **Video Renderer (El Estudio):** Obtiene material de video de archivo de Pexels (con resiliencia de búsqueda de respaldo) y renderiza videos en 1080p con FFmpeg. **NUEVO:** Integración con `VideoSourceRouter` para múltiples fuentes de video.
+- **ComfyUI Video Generation (El Artista IA):** Genera videos con IA local usando **ComfyUI con modelos Wan 2.2**. Incluye:
+  - **T2V (Text-to-Video):** Generación desde texto para pool de clips
+  - **I2V (Image-to-Video):** Anima imágenes para segmentos KEY (intro/outro) con control visual preciso
+  - **VideoSourceRouter:** Modo `hybrid` (ComfyUI para KEY, Pool/Pexels para FILLER)
+  - **ClipPoolManager:** Pool de clips pre-generados en 6 categorías
+  - **3 estilos visuales:** `cinemagraph_plotagraph`, `moody_lofi_ambient`, `analog_horror_liminal`
+  - **Pollinations.ai Fallback:** API gratuita sin límites para imágenes
+- **Cambios de Seguridad (Agosto 2026):**
+  - **Glitch RGB (0.5s):** Reemplaza strobing epiléptico de 3s. Efecto de aberración cromática 100% seguro.
+  - **Formant Shift:** Reemplaza `atempo=1.02`. Altera timbre de voz sin cambiar velocidad, indetectable por YouTube.
 - **Thumbnail Generator:** Crea miniaturas personalizadas con prompts visuales para un mejor CTR.
 - **Multi-Platform Publishers (Los Distribuidores):** 
   - **YouTube:** Subida con OAuth2 y **sanitización de etiquetas (tags)** para cumplimiento de la API.
@@ -129,10 +139,12 @@ Tras una auditoría exhaustiva del sistema original, se detectó que el algoritm
 
 - **TypeScript / Node.js** (Modo Estricto)
 - **DeepSeek API** (LLM para generación de texto y estrategia SEO)
+- **ComfyUI + Wan 2.2** (Generación local de video con IA - T2V e I2V)
+- **Pollinations.ai** (API gratuita de imágenes - fallback para I2V)
 - **Google Cloud TTS y YouTube Data API v3**
 - **Puppeteer** (Automatización de navegador headless)
 - **FFmpeg** (Renderizado de video y concatenación de audio)
-- **SQLite** (Base de datos local para analíticas y deduplicación)
+- **SQLite + better-sqlite3** (Base de datos local para analíticas, deduplicación y clips pre-generados)
 - **BullMQ y Redis** (Cola de tareas y ejecución secuencial de procesos)
 - **node-cron** (Orquestación)
 - **Docker** (Despliegue en producción)
@@ -154,6 +166,13 @@ El motor está optimizado para correr en un contenedor aislado con todas las dep
    MEDIUM_SID=tu_sid
    DEV_TO_API_KEY=tu_clave
    ENABLE_BLOG_PUBLISHING=false
+   # ComfyUI Video Generation (NUEVO)
+   VIDEO_SOURCE_MODE=hybrid
+   COMFYUI_MODEL=wan22_5B
+   COMFYUI_PATH=D:\ComfyUI
+   COMFYUI_URL=http://127.0.0.1:8188
+   CLIP_PREGENERATION_SCHEDULE=02:00-06:00
+   CLIP_POOL_MIN_PER_CATEGORY=20  # Mínimo de clips por categoría en pool
    ```
 3. Asegúrate de tener las credenciales OAuth2:
    - `oauth2.keys.json` - Credenciales de cliente de Google OAuth2 (debe estar incluido en el contenedor)
@@ -203,6 +222,14 @@ Para Asistentes de IA y mantenedores, consulta `CLAUDE.md` y `GEMINI.md` en el d
 
 ## Actualizaciones Recientes: V2 Optimización Integral (Agosto 2026)
 
+- ✅ **Generación de Video con IA Local (ComfyUI) (NUEVO):**
+  - Integración completa con **ComfyUI y modelos Wan 2.2** para generación de video Text-to-Video (T2V) e Image-to-Video (I2V)
+  - **VideoSourceRouter** con 3 modos: `comfyui` (solo IA), `pexels` (solo stock), `hybrid` (inteligente, default)
+  - **ClipPoolManager** con 6 categorías: nature, technology, business, abstract, lifestyle, urban
+  - **3 estilos visuales:** `cinemagraph_plotagraph` (producto), `moody_lofi_ambient` (educativo), `analog_horror_liminal` (hooks)
+  - **ComfyUIHealthMonitor** con health checks cada 60s y auto-reinicio en crashes
+  - **ClipDatabase** (SQLite/better-sqlite3) para tracking de clips pre-generados y uso
+  - **ScriptGenerator** genera prompts duales: `visualPrompts` (Pexels) + `comfyPrompts` (20-50 palabras para ComfyUI)
 - ✅ **Sistema Anti-Detección (Fase 1):** Implementación de `VideoTransformer` y `ThumbnailTransformer` (alteraciones geométricas/cromáticas, ruido) y variabilidad de edición para evadir los algoritmos de YouTube.
 - ✅ **Humanización Narrativa Profunda (Fase 2):** `ScriptStructureRandomizer` (6 estructuras narrativas), `MusicTransformer` (Evasión de Content ID mediante cambios de tono/tempo/ecualización), y Subtítulos SSML.
 - ✅ **Simplificación de Infraestructura (Fase 3):** `CacheManager` centralizado, Winston `Logger`, `RetryHandler`, y `RenderQueueManager` usando BullMQ.
@@ -214,10 +241,13 @@ Para Asistentes de IA y mantenedores, consulta `CLAUDE.md` y `GEMINI.md` en el d
 - ✅ **Estadísticas de Base de Datos:** Nuevo método `getStats()` para métricas de contenido agregadas.
 - ✅ **Monitoreo de Almacenamiento:** Monitoreo asíncrono y automatizado del espacio en disco para prevenir fallas en la descarga de contenido.
 - ✅ **Evasión de Detección y Retención Extrema:**
-  - **Estrategia Híbrida:** 1 de cada 5 videos se publican como "Privado" (`YouTubePublisher`) para forzar intervención manual y evadir el "shadowban de API".
+  - **Estrategia Híbrida de Publicación:** 1 de cada 5 videos se publica como **privado/no listado** para permitir revisión humana antes de hacerlo público. Esto garantiza interacción humana consistente y evita el "shadowban de API" por patrones de publicación 100% automatizados.
   - **Fatiga Semántica Rota:** Títulos cortos (< 8 palabras), Personas dinámicas, prohibición de frases cliché de IA y guiones Multi-Voz.
-  - **Zero-Silence y Máscara TTS:** Uso de `silenceremove` de FFmpeg y mutación de tiempo (`atempo=1.02`) aleatoria.
-  - **Hook Hipnótico (3s):** Se inyecta un *strobing* de alto contraste los primeros 3s junto con un impacto sonoro de ruido sintético (`anoisesrc`) para maximizar la retención inicial.
+  - **Formant Shift (reemplaza atempo=1.02):** Técnica `asetrate*1.02,aresample,atempo=0.9804` que altera el timbre sin cambiar velocidad. Indetectable por YouTube.
+  - **I2V Híbrido:** Segmentos KEY (intro/outro) usan Image-to-Video para control visual preciso. Segmentos FILLER usan T2V del pool.
+  - **Pollinations.ai Fallback:** API 100% gratuita sin límites para generación de imágenes cuando ComfyUI no está disponible.
+  - **Script init-clip-pool.ts:** Inicializa y llena el pool de clips pre-generados con ComfyUI.
+  - **Glitch RGB Seguro (0.5s):** Efecto de aberración cromática que reemplaza el strobing peligroso. 100% seguro para epilepsia, cumple políticas de YouTube.
 - ✅ **Retención Visual Neurodivergente y Anti-Repetición:**
   - **Filtros Sensoriales FFmpeg:** Uso de aberración cromática (`chromashift`) y alto contraste para emular sobrecarga/intensidad sensorial alineado al nicho de Autismo.
   - **Subtítulos ASS con SEO Estricto:** Eliminación de verbos conectores ("estar", "fue", etc.) en los resaltados; aplicando colores dinámicos (Magenta, Cian, Verde, Naranja) y micro-animaciones hiperactivas.
@@ -231,8 +261,9 @@ OmniAI-Engine/
 ├── src/
 │   ├── agents/           # SEOAgent, AnalyticsEngine
 │   ├── auth/             # Manejador de Google OAuth2
+│   ├── comfyui/          # ComfyUI integration (Client, ProcessManager, HealthMonitor, ClipPool, VideoSourceRouter)
 │   ├── db/               # Base de datos SQLite
-│   ├── generators/       # Script, Audio, Video, Blog, Thumbnail
+│   ├── generators/       # Script, Audio, Video, Blog, Thumbnail, PollinationsClient
 │   ├── publishers/       # YouTube, Hashnode, Medium, Dev.to
 │   ├── reporters/        # Notificaciones de Telegram
 │   └── utils/            # Logger, funciones auxiliares

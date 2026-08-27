@@ -197,7 +197,7 @@ export class AutonomousOrchestrator {
                 fullVideoDuration: Math.round(videoDuration), 
                 shortDuration: Math.round(videoDuration),
                 tokenFilePath: tokenPath,
-                thumbnailPath: visualPrompt
+                thumbnailPath: script.visualPrompts?.[0] || ""
             };
 
             // Retraso inicial aleatorio para evadir patrones (0 a 45 minutos)
