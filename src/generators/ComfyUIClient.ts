@@ -669,82 +669,82 @@ export class ComfyUIClient {
     }): Record<string, any> {
         const timestamp = Date.now();
         
-        // Usar archivos de modelo desde ModelConfig
+        // Usar nodos probados y funcionando de WanVideoWrapper
         const { unetModel, clipModel, vaeModel } = this.modelFiles;
         
         return {
             "1": {
-                "class_type": "UNETLoader",
+                "class_type": "WanVideoModelLoader",
                 "inputs": {
-                    "unet_name": unetModel,
-                    "weight_dtype": "default"
+                    "model": unetModel,
+                    "base_precision": "bf16",
+                    "quantization": "disabled",
+                    "load_device": "main_device"
                 }
             },
             "2": {
-                "class_type": "CLIPLoader",
+                "class_type": "WanVideoVAELoader",
                 "inputs": {
-                    "clip_name": clipModel,
-                    "type": "umt5"
+                    "model_name": vaeModel,
+                    "precision": "bf16"
                 }
             },
             "3": {
-                "class_type": "VAELoader",
+                "class_type": "LoadWanVideoT5TextEncoder",
                 "inputs": {
-                    "vae_name": vaeModel
+                    "model_name": clipModel,
+                    "precision": "bf16",
+                    "load_device": "offload_device"
                 }
             },
             "4": {
-                "class_type": "CLIPTextEncode",
+                "class_type": "WanVideoEmptyEmbeds",
                 "inputs": {
-                    "clip": ["2", 0],
-                    "text": config.prompt
+                    "width": config.width,
+                    "height": config.height,
+                    "num_frames": config.frames
                 }
             },
             "5": {
-                "class_type": "CLIPTextEncode",
+                "class_type": "WanVideoTextEncode",
                 "inputs": {
-                    "clip": ["2", 0],
-                    "text": config.negativePrompt
+                    "t5": ["3", 0],
+                    "positive_prompt": config.prompt,
+                    "negative_prompt": config.negativePrompt,
+                    "force_offload": true
                 }
             },
             "6": {
-                "class_type": "WanImageToVideo",
+                "class_type": "WanVideoSampler",
                 "inputs": {
-                    "positive": ["4", 0],
-                    "negative": ["5", 0],
-                    "vae": ["3", 0],
-                    "width": config.width,
-                    "height": config.height,
-                    "length": config.frames,
-                    "batch_size": 1
+                    "model": ["1", 0],
+                    "image_embeds": ["4", 0],
+                    "text_embeds": ["5", 0],
+                    "steps": config.steps,
+                    "cfg": config.cfg,
+                    "shift": 8.0,
+                    "seed": config.seed,
+                    "force_offload": false,
+                    "scheduler": "unipc",
+                    "riflex_freq_index": 0
                 }
             },
             "7": {
-                "class_type": "KSampler",
+                "class_type": "WanVideoDecode",
                 "inputs": {
-                    "model": ["1", 0],
-                    "positive": ["6", 0],
-                    "negative": ["6", 1],
-                    "latent_image": ["6", 2],
-                    "seed": config.seed,
-                    "steps": config.steps,
-                    "cfg": config.cfg,
-                    "sampler_name": "euler",
-                    "scheduler": "normal",
-                    "denoise": 1.0
+                    "vae": ["2", 0],
+                    "samples": ["6", 0],
+                    "enable_vae_tiling": false,
+                    "tile_x": 272,
+                    "tile_y": 272,
+                    "tile_stride_x": 144,
+                    "tile_stride_y": 128
                 }
             },
             "8": {
-                "class_type": "VAEDecode",
-                "inputs": {
-                    "samples": ["7", 0],
-                    "vae": ["3", 0]
-                }
-            },
-            "9": {
                 "class_type": "SaveAnimatedWEBP",
                 "inputs": {
-                    "images": ["8", 0],
+                    "images": ["7", 0],
                     "filename_prefix": `t2v_${timestamp}`,
                     "fps": config.fps,
                     "lossless": false,
