@@ -139,10 +139,10 @@ export const STYLE_PARAMS: Record<VisualStyle, StyleParams> = {
     }
 };
 
-/** Valores por defecto para resoluciones */
-const DEFAULT_SHORT_RESOLUTION: Resolution = { width: 576, height: 1024 };
-const DEFAULT_LONG_RESOLUTION: Resolution = { width: 832, height: 480 };
-const DEFAULT_FRAMES = 49;
+/** Valores por defecto para resoluciones (Optimizado para RTX 4060: ~4-5 mins por clip) */
+const DEFAULT_SHORT_RESOLUTION: Resolution = { width: 288, height: 512 };
+const DEFAULT_LONG_RESOLUTION: Resolution = { width: 512, height: 288 };
+const DEFAULT_FRAMES = 17;
 
 /** Presets de calidad por defecto para cada modelo */
 const DEFAULT_PRESETS: Record<string, QualityPreset> = {
