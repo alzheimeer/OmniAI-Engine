@@ -6,6 +6,7 @@ import ffmpegInstaller from '@ffmpeg-installer/ffmpeg';
 import dotenv from 'dotenv';
 import { RetryHandler, RetryError } from '../infrastructure/RetryHandler';
 import { SubtitleGenerator } from './SubtitleGenerator';
+import { ThumbnailGenerator } from './ThumbnailGenerator';
 import { FallbackStrategies } from '../infrastructure/FallbackStrategies';
 import { Logger } from '../infrastructure/Logger';
 // Importaciones para integración con VideoSourceRouter (Requirement 6.1, 6.2)
@@ -408,11 +409,50 @@ export class VideoRenderer {
             ffmpeg().input(concatListFile).inputOptions(['-f concat', '-safe 0']).outputOptions(['-c copy']).save(concatVideoPath).on('end', resolve).on('error', reject);
         });
 
+        // 3b. Generar portada / miniatura estática de 1.5s e insertar al inicio del Short
+        let videoInputToUse = concatVideoPath;
+        const thumbnailFilename = `cover_${trackingVideoId}.jpg`;
+        const coverVideoPath = path.join(__dirname, '../../content', `_short_cover_${trackingVideoId}.mp4`);
+        try {
+            const coverImgPath = await ThumbnailGenerator.generateThumbnail({
+                title: text.length > 60 ? text.substring(0, 60) + '...' : text,
+                isShort: true,
+                visualPrompt: visualPrompts?.[0],
+                outputFilename: thumbnailFilename
+            });
+
+            logger.info('Generando escena de portada (1.5s) para el Short', { coverImgPath });
+            await new Promise((res, rej) => {
+                ffmpeg()
+                    .input(coverImgPath)
+                    .loop(1.5)
+                    .outputOptions(['-c:v libx264', '-preset ultrafast', '-r 30', '-s 1080x1920', '-pix_fmt yuv420p'])
+                    .save(coverVideoPath)
+                    .on('end', res)
+                    .on('error', rej);
+            });
+
+            // Preconcatenar la portada al video concatenado
+            const coverConcatList = path.join(__dirname, '../../content', `_cover_concat_${trackingVideoId}.txt`);
+            fs.writeFileSync(coverConcatList, `file '${coverVideoPath.replace(/\\/g, '/')}'\nfile '${concatVideoPath.replace(/\\/g, '/')}'`);
+            const finalVideoWithCover = path.join(__dirname, '../../content', `_short_final_base_${trackingVideoId}.mp4`);
+            
+            await new Promise((res, rej) => {
+                ffmpeg().input(coverConcatList).inputOptions(['-f concat', '-safe 0']).outputOptions(['-c copy']).save(finalVideoWithCover).on('end', res).on('error', rej);
+            });
+
+            videoInputToUse = finalVideoWithCover;
+            if (fs.existsSync(coverImgPath)) fs.unlinkSync(coverImgPath);
+            if (fs.existsSync(coverConcatList)) fs.unlinkSync(coverConcatList);
+        } catch (coverErr: any) {
+            logger.warn('No se pudo insertar escena de portada al Short, continuando con concat estándar', { error: coverErr.message });
+        }
+
         logger.info('Videos concatenados. Mezclando audio, video y subtítulos con FFmpeg');
         
         return new Promise((resolve, reject) => {
             ffmpeg()
-                .input(concatVideoPath)
+                .input(videoInputToUse)
                 .inputOptions(['-stream_loop -1'])
                 .input(audioPath)
                 .outputOptions([
@@ -420,8 +460,6 @@ export class VideoRenderer {
                     '-preset ultrafast',
                     '-crf 23',
                     '-pix_fmt yuv420p',
-                    // Glitch RGB seguro (0.5s) - Reemplaza efecto epiléptico peligroso
-                    // Sin strobing de brillo, usa rgbashift solo en primeros 0.5s - 100% seguro para epilepsia y cumple políticas YouTube
                     `-vf scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920,eq=contrast=1.2:saturation=1.1,subtitles='${assPath.replace(/\\/g, '/').replace(/:/g, '\\:')}'`,
                     '-c:a aac',
                     '-b:a 128k',
@@ -436,6 +474,9 @@ export class VideoRenderer {
                     downloadedVideos.forEach(vid => { if (fs.existsSync(vid)) fs.unlinkSync(vid); });
                     if (fs.existsSync(concatListFile)) fs.unlinkSync(concatListFile);
                     if (fs.existsSync(concatVideoPath)) fs.unlinkSync(concatVideoPath);
+                    if (fs.existsSync(coverVideoPath)) fs.unlinkSync(coverVideoPath);
+                    const finalVideoWithCover = path.join(__dirname, '../../content', `_short_final_base_${trackingVideoId}.mp4`);
+                    if (fs.existsSync(finalVideoWithCover)) fs.unlinkSync(finalVideoWithCover);
                     resolve(outputPath);
                 })
                 .on('error', (err: Error) => {
