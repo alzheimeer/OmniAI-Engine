@@ -144,14 +144,16 @@ export class SEOAgent {
         
         const isChannel2 = channelKey === 'channel2';
         const channelNiche = isChannel2 
-            ? `PRODUCTIVIDAD, TRABAJO Y NEGOCIOS CON IA PARA NEURODIVERGENTES (TDAH / AUTISMO).
-Every single topic MUST combine:
-1. PILLAR 1: Artificial Intelligence (ChatGPT, Claude, Notion AI, Midjourney, Automation, Workflows).
-2. PILLAR 2: Workplace Productivity, Business, Focus Hacks for ADHD & Autism (Procrastinación, Hiperfoco laboral, Organización de tareas, Automatización de Negocios).`
-            : `AUTISMO E INTELIGENCIA ARTIFICIAL.
-Every single topic MUST combine:
-1. PILLAR 1: Artificial Intelligence (ChatGPT, Claude, Generative AI, AI Tools, Automation).
-2. PILLAR 2: Autism Spectrum & Neurodiversity (Autismo, Asperger, Hiperfoco, Sensibilidad Sensorial, Terapia).`;
+            ? `PRODUCTIVIDAD, TRABAJO, TECNOLOGÍA Y HACKS DE VIDA PARA NEURODIVERGENTES (TDAH / AUTISMO).
+Topics MUST rotate between these 3 pillars:
+1. PILLAR 1 - AI & Executive Function Hacks: (ChatGPT, Goblin.tools, Saner.AI, Tiimo, Notion AI, task breakdown, time blindness, friction-free organization).
+2. PILLAR 2 - Workplace & Career Strategy: (Remote work hacks, requesting accommodations without stigma, managing ADHD/Autistic burnout at work, hyperfocus management).
+3. PILLAR 3 - Sensory Environment & Hardware Setup: (Desk setups for sensory overload, noise-canceling tech, focus gadgets, reducing cognitive load).`
+            : `ENCICLOPEDIA HUMANA, CIENTÍFICA Y ESTILO DE VIDA DEL AUTISMO Y NEURODIVERSIDAD (NeuroSync AI).
+Topics MUST rotate between these 3 pillars:
+1. PILLAR 1 - Science & Medicine: (Intestinal-brain axis, neuroscience, sensory processing, sleep, genetics, medical updates).
+2. PILLAR 2 - Psychology & Hidden Traits (High Search Volume): (Adult diagnosis, Autistic Masking, high-functioning autism, burnout vs depression, stimming myths).
+3. PILLAR 3 - AI & Assistive Technology: (AI communication tools, AAC apps, AI for social situations, technology for sensory overload).`;
 
         const personas = [
             "Experto Académico (Tono serio y basado en datos)",
