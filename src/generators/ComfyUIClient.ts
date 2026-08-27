@@ -684,7 +684,7 @@ export class ComfyUIClient {
                 "class_type": "CLIPLoader",
                 "inputs": {
                     "clip_name": clipModel,
-                    "type": "wan"
+                    "type": "umt5"
                 }
             },
             "3": {
