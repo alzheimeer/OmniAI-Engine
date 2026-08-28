@@ -534,6 +534,19 @@ export class VideoSourceRouter {
             );
         }
 
+        // 1. Reuso inteligente: si existe un clip en el pool local con buena coincidencia, reutilizarlo
+        if (this.clipPoolManager && (this.clipPoolManager.shouldPrioritizeReuse() || request.segmentType === 'filler')) {
+            try {
+                const poolResult = await this.getFromPool(request, startTime);
+                if (poolResult) {
+                    console.log(`[VideoSourceRouter] Reutilizando clip del pool local: ${poolResult.outputPath}`);
+                    return poolResult;
+                }
+            } catch (poolErr: any) {
+                console.log(`[VideoSourceRouter] Busqueda en pool retorno sin coincidencias, procediendo a generar nuevo con ComfyUI`);
+            }
+        }
+
         // Requirement 5.1: Reintentar hasta 2 veces
         let lastError: Error | null = null;
         for (let attempt = 0; attempt <= this.maxComfyRetries; attempt++) {
