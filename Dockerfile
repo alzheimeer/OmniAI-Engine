@@ -2,6 +2,8 @@ FROM node:20-bullseye-slim
 
 # Instalar dependencias del SO necesarias para Puppeteer (Chromium) y FFmpeg
 RUN apt-get update && apt-get install -y \
+    build-essential \
+    python3 \
     ffmpeg \
     chromium \
     libnss3 \

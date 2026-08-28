@@ -9,3 +9,9 @@ npm-debug.log
 *.mp4
 *.mp3
 *.md
+*.gguf
+*.safetensors
+*.bin
+tmp_build
+.kiro
+
