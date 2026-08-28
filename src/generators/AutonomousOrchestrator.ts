@@ -52,26 +52,26 @@ export class AutonomousOrchestrator {
         }, cronOpts);
 
         // --- CANAL 1: NeuroSync AI (Autismo e Inteligencia Artificial) ---
-        // Shorts (Lunes, Miércoles, Viernes - 10:00 AM, 2:00 PM, 6:00 PM)
-        cron.schedule('0 10 * * 1,3,5', async () => contentQueue.add('runShortPipeline', { language: 'Spanish', channelKey: 'channel1' }), cronOpts);
-        cron.schedule('0 14 * * 1,3,5', async () => contentQueue.add('runShortPipeline', { language: 'English', channelKey: 'channel1' }), cronOpts);
-        cron.schedule('0 18 * * 1,3,5', async () => contentQueue.add('runShortPipeline', { language: 'Portuguese', channelKey: 'channel1' }), cronOpts);
+        // Shorts (Lunes, Miércoles, Viernes - 09:00 AM, 01:00 PM, 08:30 PM)
+        cron.schedule('0 9 * * 1,3,5', async () => contentQueue.add('runShortPipeline', { language: 'Spanish', channelKey: 'channel1' }), cronOpts);
+        cron.schedule('0 13 * * 1,3,5', async () => contentQueue.add('runShortPipeline', { language: 'English', channelKey: 'channel1' }), cronOpts);
+        cron.schedule('30 20 * * 1,3,5', async () => contentQueue.add('runShortPipeline', { language: 'Portuguese', channelKey: 'channel1' }), cronOpts);
 
-        // Videos Largos (Martes, Jueves, Sábados - 3:00 PM)
+        // Videos Largos (Martes, Jueves, Sábados - 03:00 PM) - 100% libre de colisión con Shorts
         cron.schedule('0 15 * * 2', async () => contentQueue.add('runLongPipeline', { language: 'Spanish', channelKey: 'channel1' }), cronOpts);
         cron.schedule('0 15 * * 4', async () => contentQueue.add('runLongPipeline', { language: 'English', channelKey: 'channel1' }), cronOpts);
         cron.schedule('0 15 * * 6', async () => contentQueue.add('runLongPipeline', { language: 'Portuguese', channelKey: 'channel1' }), cronOpts);
 
         // --- CANAL 2: NeuroTech AI (Productividad, Trabajo & Negocios con IA para Neurodivergentes) ---
-        // Shorts (Martes, Jueves, Sábados - 11:00 AM, 3:30 PM, 7:00 PM)
-        cron.schedule('0 11 * * 2,4,6', async () => contentQueue.add('runShortPipeline', { language: 'Spanish', channelKey: 'channel2' }), cronOpts);
-        cron.schedule('30 15 * * 2,4,6', async () => contentQueue.add('runShortPipeline', { language: 'English', channelKey: 'channel2' }), cronOpts);
-        cron.schedule('0 19 * * 2,4,6', async () => contentQueue.add('runShortPipeline', { language: 'Portuguese', channelKey: 'channel2' }), cronOpts);
+        // Shorts (Martes, Jueves, Sábados - 09:30 AM, 01:30 PM, 08:00 PM)
+        cron.schedule('30 9 * * 2,4,6', async () => contentQueue.add('runShortPipeline', { language: 'Spanish', channelKey: 'channel2' }), cronOpts);
+        cron.schedule('30 13 * * 2,4,6', async () => contentQueue.add('runShortPipeline', { language: 'English', channelKey: 'channel2' }), cronOpts);
+        cron.schedule('0 20 * * 2,4,6', async () => contentQueue.add('runShortPipeline', { language: 'Portuguese', channelKey: 'channel2' }), cronOpts);
 
-        // Videos Largos (Lunes, Miércoles, Viernes - 4:00 PM)
-        cron.schedule('0 16 * * 1', async () => contentQueue.add('runLongPipeline', { language: 'Spanish', channelKey: 'channel2' }), cronOpts);
-        cron.schedule('0 16 * * 3', async () => contentQueue.add('runLongPipeline', { language: 'English', channelKey: 'channel2' }), cronOpts);
-        cron.schedule('0 16 * * 5', async () => contentQueue.add('runLongPipeline', { language: 'Portuguese', channelKey: 'channel2' }), cronOpts);
+        // Videos Largos (Lunes, Miércoles, Viernes - 03:30 PM) - Con ventana holgada de 2.5 horas antes del siguiente Short
+        cron.schedule('30 15 * * 1', async () => contentQueue.add('runLongPipeline', { language: 'Spanish', channelKey: 'channel2' }), cronOpts);
+        cron.schedule('30 15 * * 3', async () => contentQueue.add('runLongPipeline', { language: 'English', channelKey: 'channel2' }), cronOpts);
+        cron.schedule('30 15 * * 5', async () => contentQueue.add('runLongPipeline', { language: 'Portuguese', channelKey: 'channel2' }), cronOpts);
 
         // 3. DIARIAMENTE - ARTÍCULOS DE BLOG MULTI-PLATAFORMA (6:00 AM, 7 DÍAS A LA SEMANA)
         cron.schedule('0 6 * * *', async () => contentQueue.add('runBlogPipeline', {}), cronOpts);
