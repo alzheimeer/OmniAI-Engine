@@ -16,7 +16,7 @@ import { ModelConfig, VideoSourceMode } from './ModelConfig';
 import { ComfyUIClient } from './ComfyUIClient';
 import { ComfyUIHealthMonitor } from './ComfyUIHealthMonitor';
 
-dotenv.config();
+import { ContentGarbageCleaner } from '../utils/ContentGarbageCleaner';
 
 // Set the path to the ffmpeg binary from the installer package
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
@@ -477,6 +477,9 @@ export class VideoRenderer {
                     if (fs.existsSync(coverVideoPath)) fs.unlinkSync(coverVideoPath);
                     const finalVideoWithCover = path.join(__dirname, '../../content', `_short_final_base_${trackingVideoId}.mp4`);
                     if (fs.existsSync(finalVideoWithCover)) fs.unlinkSync(finalVideoWithCover);
+                    
+                    // Ejecutar limpieza automatizada de basura residual
+                    ContentGarbageCleaner.cleanTemporaryFiles();
                     resolve(outputPath);
                 })
                 .on('error', (err: Error) => {
@@ -781,6 +784,9 @@ export class VideoRenderer {
                         logger.info(`Long Video render completo`, { outputPath, videoId: trackingVideoId });
                         downloadedVideos.forEach(vid => { if (fs.existsSync(vid)) fs.unlinkSync(vid); });
                         if (fs.existsSync(concatListPath)) fs.unlinkSync(concatListPath);
+
+                        // Ejecutar limpieza automatizada de basura residual
+                        ContentGarbageCleaner.cleanTemporaryFiles();
                         resolve(outputPath);
                     })
                     .on('error', (err: Error) => {
