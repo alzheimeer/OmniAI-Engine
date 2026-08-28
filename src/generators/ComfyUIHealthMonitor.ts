@@ -119,7 +119,7 @@ export const DEFAULT_HEALTH_MONITOR_CONFIG: HealthMonitorConfig = {
  */
 export class ComfyUIHealthMonitor extends EventEmitter {
     /** Si ComfyUI está actualmente disponible */
-    private isAvailable: boolean = false;
+    private isAvailable: boolean = true;
     
     /** Contador de fallos consecutivos */
     private consecutiveFailures: number = 0;

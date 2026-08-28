@@ -120,19 +120,19 @@ export const MODEL_FILES: Record<WanModelType, ModelFiles> = {
 /** Parámetros por estilo visual */
 export const STYLE_PARAMS: Record<VisualStyle, StyleParams> = {
     cinemagraph_plotagraph: {
-        frames: 33,
+        frames: 17,
         motionType: 'minimal',
         stabilityHigh: true,
         promptSuffix: 'subtle motion, gentle drift, seamless loop, static camera with minimal motion'
     },
     moody_lofi_ambient: {
-        frames: 49,
+        frames: 17,
         motionType: 'atmospheric',
         stabilityHigh: false,
         promptSuffix: 'slow movement, atmospheric drift, lo-fi aesthetic, seamless loop'
     },
     analog_horror_liminal: {
-        frames: 49,
+        frames: 17,
         motionType: 'slow_unsettling',
         stabilityHigh: false,
         promptSuffix: 'slow movement, static camera, liminal space, unsettling calm'

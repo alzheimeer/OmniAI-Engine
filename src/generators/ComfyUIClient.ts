@@ -317,8 +317,25 @@ export class ComfyUIClient {
             const sourceFile = path.join(this.outputDir, outputFiles[0]);
             const destFile = path.join(this.localOutputDir, `t2v_${Date.now()}_${path.basename(outputFiles[0])}`);
             
+            let finalFilePath = destFile;
             if (fs.existsSync(sourceFile)) {
                 fs.copyFileSync(sourceFile, destFile);
+                
+                // Si el archivo de ComfyUI es .webp animado, convertirlo a .mp4 usando Python (PIL+OpenCV) para que FFmpeg lo concatene sin errores
+                if (destFile.endsWith('.webp')) {
+                    const mp4Path = destFile.replace('.webp', '.mp4');
+                    try {
+                        const execSync = (await import('child_process')).execSync;
+                        const pythonCmd = `D:\\ComfyUI\\venv_cuda\\Scripts\\python.exe -c "import cv2, PIL.Image, PIL.ImageSequence, numpy as np; im = PIL.Image.open('${destFile.replace(/\\/g, '/')}'); frames = [cv2.cvtColor(np.array(f.convert('RGB')), cv2.COLOR_RGB2BGR) for f in PIL.ImageSequence.Iterator(im)]; h, w, _ = frames[0].shape; out = cv2.VideoWriter('${mp4Path.replace(/\\/g, '/')}', cv2.VideoWriter_fourcc(*'mp4v'), 16, (w, h)); [out.write(f) for f in frames]; out.release()"`;
+                        execSync(pythonCmd, { stdio: 'ignore' });
+                        if (fs.existsSync(mp4Path)) {
+                            finalFilePath = mp4Path;
+                            logger.info('Convertido WEBP animado de ComfyUI a MP4 exitosamente vía Python PIL+OpenCV', { mp4Path });
+                        }
+                    } catch (convErr: any) {
+                        logger.warn('No se pudo convertir WEBP a MP4 en ComfyUIClient, usando WEBP original', { error: convErr.message });
+                    }
+                }
             } else {
                 throw new Error(`Archivo de salida no encontrado: ${sourceFile}`);
             }
@@ -337,7 +354,7 @@ export class ComfyUIClient {
             });
 
             return {
-                outputPath: destFile,
+                outputPath: finalFilePath,
                 prompt: finalConfig.prompt,
                 generationTimeSeconds: generationTime,
                 dimensions: { width: finalConfig.width, height: finalConfig.height },
