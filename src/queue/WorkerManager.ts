@@ -66,17 +66,17 @@ export class WorkerManager {
                     dispatcher.configurePublishers(); 
                     
                     const result = await dispatcher.dispatch(job.data.sourceContent, job.data.options);
+                    const ytResult = result.platformResults?.find(r => r.platform === 'youtube');
                     
-                    if (result.success) {
+                    if (result.success || (ytResult && ytResult.success)) {
                         Logger.success('PublishWorker', `Dispatch completado exitosamente: ${result.dispatchId}`);
                         
                         // Guardar en BD (Simulando la lógica que estaba en Orchestrator)
-                        if (job.data.videoMetadata) {
-                            const ytResult = result.platformResults.find(r => r.platform === 'youtube');
-                            const url = ytResult?.contentUrl || '';
+                        if (job.data.videoMetadata && ytResult && ytResult.success) {
+                            const url = ytResult.contentUrl || '';
                             const youtubeId = url.split('v=')[1] || url.split('/').pop() || '';
                             
-                            if (youtubeId && !url.includes('dry-run')) {
+                            if (youtubeId && !url.includes('dry-run') && !url.startsWith('DEFERRED:')) {
                                 await Database.saveVideo(
                                     youtubeId, 
                                     job.data.videoMetadata.title, 
@@ -90,8 +90,12 @@ export class WorkerManager {
                             
                             await TelegramReporter.sendMessage(`✅ <b>Video de ${job.data.videoMetadata.channelName} publicado con éxito!</b>\nIdioma: ${job.data.videoMetadata.language}\nURL: ${url}`);
                         }
+
+                        if (result.failedPlatforms && result.failedPlatforms.length > 0) {
+                            Logger.warn('PublishWorker', `Dispatch completado en YouTube pero falló en: ${result.failedPlatforms.join(', ')}`);
+                        }
                     } else {
-                        throw new Error(`Dispatch falló para algunas plataformas: ${result.failedPlatforms.join(', ')}`);
+                        throw new Error(`Dispatch falló: ${result.failedPlatforms?.join(', ') || 'No se pudo publicar en ninguna plataforma'}`);
                     }
                 }
             } catch (error: any) {

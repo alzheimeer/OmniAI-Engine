@@ -451,31 +451,48 @@ export class MultiPlatformDispatcher {
             dryRun: options.dryRun || false
         });
 
-        // 1. Validar YPP gate (si no está en bypass)
+        // 1. Validar plataformas y filtrar por YPP gate si aplica
+        let requestedPlatforms = options.platforms || DEFAULT_PUBLISH_ORDER;
+        const platformResults: PlatformPublishResult[] = [];
+        const blockedPlatforms: Platform[] = [];
+
         if (!options.bypassYPPGate) {
-            this.updateProgress('validating', null, 'Validando YPP gate...');
+            this.updateProgress('validating', null, 'Validando YPP gate para plataformas secundarias...');
             
-            // Usar datos de monetización proporcionados o valores por defecto
             const monetizationData: MonetizationData = options.monetizationData || {
                 hasFirstDollar: false,
                 totalRevenue: 0,
                 monthsWithRevenue: 0
             };
-            
-            const yppCheck = this.yppGate.canExpandToPlatform('instagram' as YPPPlatform, monetizationData);
-            
-            if (!yppCheck.allowed) {
-                this.logger.warn('Dispatch bloqueado por YPP gate', {
-                    reason: yppCheck.reason
-                });
-                
+
+            const allowedPlatforms: Platform[] = [];
+            for (const p of requestedPlatforms) {
+                if (p === 'youtube') {
+                    allowedPlatforms.push(p);
+                } else {
+                    const yppCheck = this.yppGate.canExpandToPlatform(p as YPPPlatform, monetizationData);
+                    if (yppCheck.allowed) {
+                        allowedPlatforms.push(p);
+                    } else {
+                        this.logger.info(`Plataforma ${p} bloqueada por YPP Gate (esperando primer dólar en YouTube)`, {
+                            reason: yppCheck.reason
+                        });
+                        blockedPlatforms.push(p);
+                    }
+                }
+            }
+
+            if (allowedPlatforms.length === 0) {
+                this.logger.warn('Todas las plataformas solicitadas están bloqueadas por YPP gate');
                 return this.createBlockedResult(
-                    dispatchId, 
-                    startedAt, 
-                    yppCheck.reason,
+                    dispatchId,
+                    startedAt,
+                    'Plataformas bloqueadas por YPP Gate',
                     options
                 );
             }
+
+            requestedPlatforms = allowedPlatforms;
         }
 
         // 2. Generar schedule aleatorio (REQ-3.4.3)
@@ -487,12 +504,13 @@ export class MultiPlatformDispatcher {
         this.logger.info('Schedule generado', {
             youtube: schedule.youtubePublishAt.toISOString(),
             instagram: schedule.instagramPublishAt.toISOString(),
-            tiktok: schedule.tiktokPublishAt.toISOString()
+            tiktok: schedule.tiktokPublishAt.toISOString(),
+            activePlatforms: requestedPlatforms,
+            blockedPlatforms
         });
 
         // 3. Preparar plataformas a publicar
-        const platforms = options.platforms || DEFAULT_PUBLISH_ORDER;
-        const platformResults: PlatformPublishResult[] = [];
+        const platforms = requestedPlatforms;
         let previousPublishTime: Date | null = null;
 
         // 4. Ejecutar publicación por plataforma
@@ -869,11 +887,15 @@ export class MultiPlatformDispatcher {
         platform: Platform
     ): Promise<{ videoPath: string; duration: number; coverPath?: string }> {
         // Seleccionar video fuente según estrategia
-        const sourceVideo = strategy.useFullVideo 
+        const isLongVideo = (content.fullVideoDuration && content.fullVideoDuration > 60) || 
+                            (content.fullVideoPath && content.fullVideoPath.includes('long'));
+        const useFull = (platform === 'youtube' && isLongVideo) || strategy.useFullVideo;
+
+        const sourceVideo = useFull 
             ? content.fullVideoPath 
             : content.shortVideoPath;
         
-        const sourceDuration = strategy.useFullVideo
+        const sourceDuration = useFull
             ? content.fullVideoDuration
             : content.shortDuration;
         

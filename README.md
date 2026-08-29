@@ -253,6 +253,10 @@ Para Asistentes de IA y mantenedores, consulta `CLAUDE.md` y `GEMINI.md` en el d
   - **Subtítulos ASS con SEO Estricto:** Eliminación de verbos conectores ("estar", "fue", etc.) en los resaltados; aplicando colores dinámicos (Magenta, Cian, Verde, Naranja) y micro-animaciones hiperactivas.
   - **Pexels Anti-Reuse Engine:** Memoria de los últimos 100 clips de stock (`used_pexels_videos.json`) e incremento de cuota de búsqueda (`per_page=15`) para garantizar material visual inédito continuo.
   - **Sanitización de Scripts:** Supresión de *hooks* dobles redundantes en la generación de documentales largos.
+- ✅ **Despachador Multiplataforma Resiliente:**
+  - **Aislamiento de YPP Gate:** YouTube (canal principal) se publica de forma ininterrumpida e independiente del estado de monetización de canales secundarios (TikTok/Instagram), evitando que el bloqueo preventivo de expansión impida la publicación en YouTube.
+  - **Detección Dinámica de Videos Largos:** Garantiza que `MultiPlatformDispatcher` utilice siempre el archivo de video completo (`fullVideoPath`) y su duración correspondiente para videos largos.
+  - **Registro Seguro en BD y Alertas:** `WorkerManager` registra la publicación exitosa en SQLite y reporta a Telegram en cuanto YouTube confirma la subida, aislando fallas o bloqueos de plataformas accesorias.
 
 ## Arquitectura
 

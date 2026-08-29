@@ -311,7 +311,8 @@ Implementación exhaustiva según spec `omniai-v2-optimization`, enfocada en eva
    - Utiliza **YouTube Analytics API v2** en código real para verificar retención, ingresos (`hasFirstDollar`) y suscriptores para habilitar el motor multiplataforma.
 5. **Expansión Multiplataforma (Fase 5):**
    - Implementaciones completas de `InstagramPublisher` y `TikTokPublisher` mediante Puppeteer Stealth (en espera de desactivación de la Regla de oro YPP).
-   - `MultiPlatformDispatcher`: Horarios aleatorios de publicación y retrasos secuenciales.
+   - `MultiPlatformDispatcher`: Horarios aleatorios de publicación y retrasos secuenciales. **Aislamiento de YPP Gate:** YouTube siempre publica sin interrupción mientras que plataformas secundarias no elegibles son filtradas de manera segura sin abortar el flujo principal.
+   - Detección automática de videos largos en `MultiPlatformDispatcher` para asegurar el uso del `fullVideoPath` y duración completa.
 6. **Infraestructura Avanzada (Fase 6):**
    - `CircuitBreaker`, Dead-Letter Queue (BullMQ) y dashboard de estado.
 

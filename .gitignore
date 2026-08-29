@@ -29,6 +29,16 @@ cache/
 logs/
 test-output/
 test-logs-retry/
+tmp_build/
+
+# GGUF models and binary weights
+*.gguf
+*.b64
+*.log
+
+# Scratch outputs
+*.txt
+check_dbs.cjs
 
 # OS generated files
 .DS_Store
