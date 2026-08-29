@@ -1,0 +1,917 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Agregar dependencias necesarias al proyecto": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716092105
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716105756
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716262290
+      }
+    ],
+    "1.2 Crear estructura de directorios necesaria": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716092258
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716106721
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716263161
+      }
+    ],
+    "1.3 Agregar variables de entorno al archivo .env.example": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716092390
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716107678
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716264099
+      }
+    ],
+    "2.1 Crear archivo src/generators/ModelConfig.ts con tipos e interfaces": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716092497
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716272895
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787717116334
+      }
+    ],
+    "2.2 Implementar clase ModelConfig con patrón singleton": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716092572
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787717121115
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787742559814
+      }
+    ],
+    "2.3 Implementar métodos de configuración de resolución": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716092637
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787717121982
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787742560665
+      }
+    ],
+    "2.4 Implementar validación de VideoSourceMode": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716092725
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787717122997
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787742561511
+      }
+    ],
+    "3. Checkpoint - Validar ModelConfig": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716092793
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787743323915
+      }
+    ],
+    "4.1 Crear archivo src/generators/ComfyUIProcessManager.ts con interfaces": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716092868
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787742569643
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787743264442
+      }
+    ],
+    "4.2 Implementar lógica de inicio del proceso": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716092958
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787743359688
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744111794
+      }
+    ],
+    "4.3 Implementar espera de startup con timeout": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093019
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787743360662
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744112614
+      }
+    ],
+    "4.4 Implementar manejo de crash y reinicio automático": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093108
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787743361722
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744113545
+      }
+    ],
+    "4.5 Implementar shutdown graceful": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093170
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787743362656
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744114480
+      }
+    ],
+    "5.1 Crear archivo src/generators/ComfyUIHealthMonitor.ts con interfaces": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093231
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787743363947
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744115646
+      }
+    ],
+    "5.2 Implementar health checks periódicos": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093286
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744120529
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744613623
+      }
+    ],
+    "5.3 Implementar lógica de disponibilidad con threshold": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093341
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744121665
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744614510
+      }
+    ],
+    "6. Checkpoint - Validar Process Manager y Health Monitor": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093399
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744615784
+      }
+    ],
+    "7.1 Crear archivo src/generators/ClipDatabase.ts con interfaces": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093463
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744626103
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745120206
+      }
+    ],
+    "7.2 Implementar inicialización y migraciones": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093532
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744627155
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745121024
+      }
+    ],
+    "7.3 Implementar CRUD de clips": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093584
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744628148
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745122007
+      }
+    ],
+    "7.4 Implementar tracking de uso": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093635
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744629051
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745122877
+      }
+    ],
+    "7.5 Implementar queries de consulta": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093696
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744630037
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745123795
+      }
+    ],
+    "8.1 Crear archivo src/generators/ClipPoolManager.ts con interfaces": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093787
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745132246
+      }
+    ],
+    "8.2 Implementar gestión del pool y selección de clips": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093850
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745133444
+      }
+    ],
+    "8.3 Implementar lógica de priorización del pool": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093912
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745129199
+      }
+    ],
+    "8.4 Implementar scheduler de pre-generación nocturna": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716093973
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745131256
+      }
+    ],
+    "8.5 Implementar sesión de pre-generación": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716094029
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745130257
+      }
+    ],
+    "9. Checkpoint - Validar Database y Pool Manager": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716094082
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745691793
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745700291
+      }
+    ],
+    "10.1 Crear archivo src/generators/VideoSourceRouter.ts con interfaces": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716094145
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745705004
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746084334
+      }
+    ],
+    "10.2 Implementar clasificación de segmentos": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716094209
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746089303
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746583824
+      }
+    ],
+    "10.3 Implementar routing según modo 'comfyui'": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716094268
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746090362
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746584040
+      }
+    ],
+    "10.4 Implementar routing según modo 'pexels'": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716094323
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746091444
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746583944
+      }
+    ],
+    "10.5 Implementar routing según modo 'hybrid'": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716094378
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746092249
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746584130
+      }
+    ],
+    "10.6 Implementar generación sintética con FFmpeg": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716094435
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746093257
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746584249
+      }
+    ],
+    "10.7 Implementar tracking de uso y resultado": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716095161
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746094382
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746584377
+      }
+    ],
+    "11. Checkpoint - Validar VideoSourceRouter": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716095349
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746589810
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746598587
+      }
+    ],
+    "12.1 Refactorizar para usar ModelConfig": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716095476
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746603433
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787747112523
+      }
+    ],
+    "12.2 Agregar soporte para VideoType y resoluciones dinámicas": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716095587
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746604630
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787747114443
+      }
+    ],
+    "12.3 Agregar soporte para estilos visuales": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716095706
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746605702
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787747115410
+      }
+    ],
+    "12.4 Mejorar logging y métricas": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716095801
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787746606681
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787747113447
+      }
+    ],
+    "13.1 Definir nuevas interfaces para prompts duales": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716095895
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787747120890
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787748578010
+      }
+    ],
+    "13.2 Modificar prompt de DeepSeek para generar comfyPrompts": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716096000
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787747122104
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787748576857
+      }
+    ],
+    "13.3 Implementar asignación de estilos visuales": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716096099
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787747123533
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787748575904
+      }
+    ],
+    "13.4 Implementar validación de correspondencia 1:1": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716096213
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787747124417
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787748574946
+      }
+    ],
+    "14.1 Refactorizar para usar VideoSourceRouter": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716096325
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787748582890
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787749028057
+      }
+    ],
+    "14.2 Modificar renderVideo para Shorts": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716096442
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787748585232
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787749027081
+      }
+    ],
+    "14.3 Modificar renderLongVideo": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716096584
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787748583988
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787749029022
+      }
+    ],
+    "14.4 Mantener cache de videos usados": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716096688
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787748586318
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787749026070
+      }
+    ],
+    "15. Checkpoint - Validar modificaciones a componentes existentes": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716096777
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787749034664
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787749044428
+      }
+    ],
+    "16.1 Crear archivo src/generators/VideoGenerationError.ts": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716096859
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787749050410
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787751967101
+      }
+    ],
+    "16.2 Integrar errores en todos los componentes": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716096961
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787749049330
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787751968093
+      }
+    ],
+    "18. Checkpoint Final - Validación completa": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716097053
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787751984147
+      },
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787752018136
+      }
+    ],
+    "1. Configuración del proyecto y dependencias": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787716264211
+      }
+    ],
+    "2. Implementar ModelConfig - Configuración de modelos y resoluciones": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787742561638
+      }
+    ],
+    "4. Implementar ComfyUIProcessManager - Gestión del proceso ComfyUI": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744114588
+      }
+    ],
+    "5. Implementar ComfyUIHealthMonitor - Monitoreo de salud": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787744614600
+      }
+    ],
+    "7. Implementar ClipDatabase - Base de datos SQLite": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787745123885
+      }
+    ],
+    "12. Modificar ComfyUIClient - Soporte para modelos y estilos": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787747115511
+      }
+    ],
+    "13. Modificar ScriptGenerator - Prompts duales y estilos": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787748578135
+      }
+    ],
+    "14. Modificar VideoRenderer - Integración con router": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787749029119
+      }
+    ],
+    "16. Implementar VideoGenerationError - Manejo de errores": [
+      {
+        "executionId": "6de8e322-f829-4509-8934-10601fd8812a",
+        "chatSessionId": "sess_a110930a-8348-4f50-9c74-05a1825bed1b",
+        "timestamp": 1787751968159
+      }
+    ]
+  }
+}
