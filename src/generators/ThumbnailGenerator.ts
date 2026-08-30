@@ -23,28 +23,118 @@ export class ThumbnailGenerator {
      */
     public static buildAIPrompt(title: string, visualPrompt?: string, isShort: boolean = true): string {
         const theme = visualPrompt || title || 'autism and artificial intelligence technology';
-        const resolution = isShort ? '1080x1920 vertical' : '1280x720 landscape';
+        
+        if (isShort) {
+            // Formato Vertical (Shorts 9:16)
+            return [
+                `Vertical YouTube Short thumbnail background (1080x1920):`,
+                `- SUBJECT: ${theme}, futuristic glowing cyborg or brain with glowing cyan neural pathways`,
+                `- COMPOSITION: Vertical portrait, focal subject centered in middle-lower third, clean dark space at top for title`,
+                `- LIGHTING: Ultra dramatic volumetric lighting, vibrant cyan #00d4ff rim lights, deep black #060913 background`,
+                `- STYLE: 8k resolution, cinematic Octane render, highly detailed, photorealistic concept art`,
+                `- NEGATIVE: No text, no letters, no words, no arrows, no watermarks, no blurry artifacts`
+            ].join('\n');
+        } else {
+            // Formato Horizontal (Videos Largos 16:9)
+            return [
+                `Horizontal YouTube video thumbnail background (1280x720, 16:9):`,
+                `- SUBJECT: ${theme}, stunning futuristic glowing neural AI interface or cybernetic technology`,
+                `- COMPOSITION: Rule of thirds, strong focal point on the RIGHT side, deep dark empty negative space on the LEFT 50% for text`,
+                `- LIGHTING: High-contrast dramatic cinematic lighting, glowing neon cyan #00d4ff accents, deep black #050811 shadows`,
+                `- STYLE: 8k Unreal Engine 5 render, cinematic movie poster style, sharp focus`,
+                `- NEGATIVE: No text, no letters, no words, no signs, no logos, no watermark, no blurred low-res`
+            ].join('\n');
+        }
+    }
 
-        return [
-            `YouTube thumbnail background, ${resolution}:`,
-            `- TEMA: ${theme}`,
-            `- ESTILO: Fotografía macro de circuito neural con luz cyan bioluminiscente y tecnología futurista`,
-            `- COMPOSICIÓN: Rule of thirds, espacio negativo 40% para texto, punto focal único y nítido`,
-            `- ILUMINACIÓN: Contraste dramático, rim light cyan brillante, sombras profundas`,
-            `- MOOD: Futurista, accesible, impactante, profesional`,
-            `- COLORES: Negro #0a0a0a, Cyan neón #00d4ff, Azul profundo #0f172a, Blanco #ffffff`,
-            `- EVITAR: Rostros genéricos, flechas rojas, texto escrito, letras, marcas de agua, baja calidad`
-        ].join('\n');
+    /**
+     * Obtiene una imagen de fondo de alta calidad usando Google Imagen / Flux AI / Pollinations / Pexels
+     */
+    private static async fetchBackgroundImage(
+        title: string, 
+        visualPrompt: string | undefined, 
+        isShort: boolean, 
+        width: number, 
+        height: number
+    ): Promise<string> {
+        const prompt = this.buildAIPrompt(title, visualPrompt, isShort);
+
+        // 1. Google Gemini / Imagen 3
+        const googleKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
+        if (googleKey) {
+            try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${googleKey}`;
+                const response = await axios.post(url, {
+                    instances: [{ prompt }],
+                    parameters: {
+                        sampleCount: 1,
+                        aspectRatio: isShort ? '9:16' : '16:9',
+                        outputMimeType: 'image/jpeg'
+                    }
+                }, { timeout: 15000 });
+
+                const b64 = response.data?.predictions?.[0]?.bytesBase64Encoded;
+                if (b64) {
+                    console.log(`🤖 Background generado con Google Imagen 3!`);
+                    return `data:image/jpeg;base64,${b64}`;
+                }
+            } catch (err) {
+                // Continuar al siguiente nivel
+            }
+        }
+
+        // 2. Pollinations Flux / Turbo AI (Calidad cine / 3D)
+        const models = ['flux', 'turbo'];
+        for (const model of models) {
+            try {
+                const seed = Math.floor(Math.random() * 9999999);
+                const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${width}&height=${height}&model=${model}&nologo=true&seed=${seed}`;
+                console.log(`🎨 Generando fondo visual (${model.toUpperCase()} ${isShort ? '9:16' : '16:9'})...`);
+                
+                const response = await axios.get(pollinationsUrl, { 
+                    responseType: 'arraybuffer', 
+                    timeout: 45000 
+                });
+
+                if (response.data && response.data.length > 5000) {
+                    const b64 = Buffer.from(response.data).toString('base64');
+                    console.log(`✅ Background generado con ${model.toUpperCase()} (${response.data.length} bytes)`);
+                    return `data:image/jpeg;base64,${b64}`;
+                }
+            } catch (err: any) {
+                console.log(`⚠️ ${model} no respondió rápido (${err.message}), probando alternativa...`);
+            }
+        }
+
+        // 3. Fallback a Pexels
+        const pexelsKey = process.env.PEXELS_API_KEY;
+        if (pexelsKey) {
+            try {
+                const searchQuery = visualPrompt || 'futuristic artificial intelligence neural network dark cyan';
+                const orientation = isShort ? 'portrait' : 'landscape';
+                const pexelsRes = await axios.get(
+                    `https://api.pexels.com/v1/search?query=${encodeURIComponent(searchQuery)}&orientation=${orientation}&per_page=5`,
+                    { headers: { Authorization: pexelsKey }, timeout: 10000 }
+                );
+
+                if (pexelsRes.data.photos && pexelsRes.data.photos.length > 0) {
+                    const photo = pexelsRes.data.photos[0];
+                    console.log(`📷 Background obtenido de Pexels (ID: ${photo.id})`);
+                    return photo.src.large2x || photo.src.large;
+                }
+            } catch (pexelsErr: any) {
+                console.log(`⚠️ Pexels error: ${pexelsErr.message}`);
+            }
+        }
+
+        return '';
     }
 
     /**
      * Genera una miniatura personalizada de alto impacto (CTR) para YouTube
-     * utilizando IA (Google Gemini / Imagen / Flux) + renderizado HTML/CSS vía Puppeteer.
-     * @param config Configuración de la miniatura
-     * @returns Ruta del archivo generado
      */
     public static async generateThumbnail(config: ThumbnailConfig): Promise<string> {
-        console.log(`🖼️ ThumbnailGenerator: Creando thumbnail de alto impacto para "${config.title}"...`);
+        console.log(`🖼️ ThumbnailGenerator: Creando thumbnail para "${config.title}" (${config.isShort ? 'Short 9:16' : 'Video Largo 16:9'})...`);
         
         const contentDir = path.join(__dirname, '../../content');
         if (!fs.existsSync(contentDir)) {
@@ -58,80 +148,16 @@ export class ThumbnailGenerator {
             ? 'NeuroTech AI' 
             : 'NeuroSync AI';
 
-        let backgroundDataUrl = '';
+        // 1. Obtener imagen de fondo con IA
+        const backgroundDataUrl = await this.fetchBackgroundImage(
+            config.title, 
+            config.visualPrompt, 
+            config.isShort, 
+            width, 
+            height
+        );
 
-        // 1. Intentar generar fondo con Google Gemini / Imagen 3 API
-        const googleKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
-        if (googleKey) {
-            try {
-                const prompt = this.buildAIPrompt(config.title, config.visualPrompt, config.isShort);
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${googleKey}`;
-                const response = await axios.post(url, {
-                    instances: [{ prompt }],
-                    parameters: {
-                        sampleCount: 1,
-                        aspectRatio: config.isShort ? '9:16' : '16:9',
-                        outputMimeType: 'image/jpeg'
-                    }
-                }, { timeout: 15000 });
-
-                const b64 = response.data?.predictions?.[0]?.bytesBase64Encoded;
-                if (b64) {
-                    backgroundDataUrl = `data:image/jpeg;base64,${b64}`;
-                    console.log(`🤖 Background generado con éxito mediante Google Imagen 3!`);
-                }
-            } catch (googleErr: any) {
-                // Silencioso: fallback a Flux/Pollinations
-            }
-        }
-
-        // 2. Si Google API no está activa, usar Flux AI (100% gratuito, ilimitado y de máxima calidad)
-        if (!backgroundDataUrl) {
-            try {
-                const prompt = this.buildAIPrompt(config.title, config.visualPrompt, config.isShort);
-                const seed = Math.floor(Math.random() * 999999);
-                const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${width}&height=${height}&model=flux&nologo=true&seed=${seed}`;
-                
-                console.log(`🎨 Generando fondo visual único con Flux AI...`);
-                const response = await axios.get(pollinationsUrl, { 
-                    responseType: 'arraybuffer', 
-                    timeout: 35000 
-                });
-
-                if (response.data && response.data.length > 0) {
-                    const b64 = Buffer.from(response.data).toString('base64');
-                    backgroundDataUrl = `data:image/jpeg;base64,${b64}`;
-                    console.log(`✅ Background generado exitosamente con Flux AI (${response.data.length} bytes)`);
-                }
-            } catch (fluxErr: any) {
-                console.log(`⚠️ Flux AI no disponible (${fluxErr.message}), probando Pexels API...`);
-            }
-        }
-
-        // 3. Fallback a Pexels API si las IAs no responden
-        if (!backgroundDataUrl) {
-            const apiKey = process.env.PEXELS_API_KEY;
-            if (apiKey) {
-                try {
-                    const searchQuery = config.visualPrompt || 'artificial intelligence brain technology';
-                    const orientation = config.isShort ? 'portrait' : 'landscape';
-                    const pexelsRes = await axios.get(
-                        `https://api.pexels.com/v1/search?query=${encodeURIComponent(searchQuery)}&orientation=${orientation}&per_page=5`,
-                        { headers: { Authorization: apiKey }, timeout: 10000 }
-                    );
-
-                    if (pexelsRes.data.photos && pexelsRes.data.photos.length > 0) {
-                        const photo = pexelsRes.data.photos[0];
-                        backgroundDataUrl = photo.src.large2x || photo.src.large;
-                        console.log(`📷 Background obtenido de Pexels (ID: ${photo.id})`);
-                    }
-                } catch (pexelsErr: any) {
-                    console.log(`⚠️ Pexels error: ${pexelsErr.message}`);
-                }
-            }
-        }
-
-        // 4. Renderizado HTML/CSS de alto impacto con Puppeteer
+        // 2. Renderizado HTML/CSS especializado por formato con Puppeteer
         await this.renderThumbnailWithPuppeteer(
             outputPath,
             width,
@@ -159,105 +185,201 @@ export class ThumbnailGenerator {
         isShort: boolean
     ): Promise<void> {
         
-        const fontSize = isShort ? 74 : 68;
         const escapedTitle = this.escapeHtml(title);
         const highlightedTitle = this.highlightKeywords(escapedTitle);
-        
-        const backgroundStyle = backgroundImageUrl
-            ? `background-image: linear-gradient(180deg, rgba(5,10,25,0.75) 0%, rgba(5,10,25,0.15) 45%, rgba(5,10,25,0.85) 100%), url('${backgroundImageUrl}'); background-size: cover; background-position: center;`
-            : `background: linear-gradient(135deg, #0a0e1a 0%, #061126 50%, #031b33 100%);`;
 
-        const containerPadding = isShort ? 'padding-top: 240px;' : 'padding: 60px 80px; justify-content: center;';
-        const cardMaxWidth = isShort ? 'max-width: 90%;' : 'max-width: 820px;';
+        let html = '';
 
-        const html = `
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <style>
-                @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
-                
-                * {
-                    margin: 0;
-                    padding: 0;
-                    box-sizing: border-box;
-                }
-                
-                body {
-                    width: ${width}px;
-                    height: ${height}px;
-                    ${backgroundStyle}
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    ${containerPadding}
-                    overflow: hidden;
-                }
-                
-                .title-card {
-                    background: rgba(8, 14, 28, 0.86);
-                    backdrop-filter: blur(16px);
-                    -webkit-backdrop-filter: blur(16px);
-                    border: 3px solid #00d4ff;
-                    border-radius: 28px;
-                    padding: ${isShort ? '42px 34px' : '36px 48px'};
-                    ${cardMaxWidth}
-                    text-align: center;
-                    box-shadow: 0 25px 60px rgba(0,0,0,0.92), 0 0 45px rgba(0,212,255,0.4);
-                }
-                
-                .badge {
-                    display: inline-block;
-                    background: #00d4ff;
-                    color: #050b14;
-                    font-family: 'Montserrat', sans-serif;
-                    font-size: ${isShort ? '26px' : '22px'};
-                    font-weight: 900;
-                    padding: 8px 24px;
-                    border-radius: 10px;
-                    margin-bottom: 22px;
-                    letter-spacing: 2px;
-                    text-transform: uppercase;
-                }
-                
-                .title {
-                    font-family: 'Montserrat', 'Arial Black', Arial, sans-serif;
-                    font-size: ${fontSize}px;
-                    font-weight: 900;
-                    color: #ffffff;
-                    text-transform: uppercase;
-                    line-height: 1.16;
-                    letter-spacing: 1.5px;
-                    text-shadow: 0 4px 14px rgba(0,0,0,0.95);
-                }
-                
-                .highlight {
-                    color: #00d4ff;
-                    text-shadow: 0 0 30px rgba(0, 212, 255, 0.85);
-                }
-                
-                .brand {
-                    position: absolute;
-                    bottom: ${isShort ? '45px' : '30px'};
-                    ${isShort ? 'left: 50%; transform: translateX(-50%);' : 'right: 50px;'}
-                    font-family: 'Montserrat', sans-serif;
-                    font-size: ${isShort ? '28px' : '24px'};
-                    font-weight: 900;
-                    color: #00d4ff;
-                    letter-spacing: 3px;
-                    text-shadow: 0 3px 10px rgba(0,0,0,0.95);
-                }
-            </style>
-        </head>
-        <body>
-            <div class="title-card">
-                <div class="badge">NUEVA IA</div>
-                <div class="title">${highlightedTitle}</div>
-            </div>
-            <div class="brand">${brandName.toUpperCase()}</div>
-        </body>
-        </html>
-        `;
+        if (isShort) {
+            // ==========================================
+            // PLANTILLA SHORTS VERTICALES (9:16 - 1080x1920)
+            // ==========================================
+            const backgroundStyle = backgroundImageUrl
+                ? `background-image: linear-gradient(180deg, rgba(6,10,22,0.85) 0%, rgba(6,10,22,0.1) 40%, rgba(6,10,22,0.85) 100%), url('${backgroundImageUrl}'); background-size: cover; background-position: center;`
+                : `background: linear-gradient(135deg, #0a0e1a 0%, #061126 50%, #031b33 100%);`;
+
+            html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body {
+                        width: ${width}px;
+                        height: ${height}px;
+                        ${backgroundStyle}
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        padding-top: 200px;
+                        overflow: hidden;
+                        font-family: 'Montserrat', sans-serif;
+                    }
+                    .title-card {
+                        background: rgba(6, 11, 24, 0.82);
+                        backdrop-filter: blur(20px);
+                        -webkit-backdrop-filter: blur(20px);
+                        border: 3px solid #00d4ff;
+                        border-radius: 26px;
+                        padding: 38px 32px;
+                        max-width: 90%;
+                        text-align: center;
+                        box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 40px rgba(0,212,255,0.4);
+                    }
+                    .badge {
+                        display: inline-block;
+                        background: #00d4ff;
+                        color: #030712;
+                        font-size: 24px;
+                        font-weight: 900;
+                        padding: 8px 22px;
+                        border-radius: 10px;
+                        margin-bottom: 18px;
+                        letter-spacing: 2px;
+                        text-transform: uppercase;
+                    }
+                    .title {
+                        font-size: 70px;
+                        font-weight: 900;
+                        color: #ffffff;
+                        text-transform: uppercase;
+                        line-height: 1.15;
+                        letter-spacing: 1px;
+                        text-shadow: 0 4px 16px rgba(0,0,0,0.95);
+                    }
+                    .highlight {
+                        color: #00d4ff;
+                        text-shadow: 0 0 35px rgba(0, 212, 255, 0.9);
+                    }
+                    .brand {
+                        position: absolute;
+                        bottom: 45px;
+                        font-size: 28px;
+                        font-weight: 900;
+                        color: #00d4ff;
+                        letter-spacing: 3px;
+                        text-shadow: 0 3px 12px rgba(0,0,0,0.95);
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="title-card">
+                    <div class="badge">NUEVA IA</div>
+                    <div class="title">${highlightedTitle}</div>
+                </div>
+                <div class="brand">${brandName.toUpperCase()}</div>
+            </body>
+            </html>
+            `;
+        } else {
+            // ==========================================
+            // PLANTILLA VIDEOS LARGOS HORIZONTALES (16:9 - 1280x720)
+            // DISEÑO ASIMÉTRICO (REGLA DE TERCIOS: TEXTO IZQUIERDA, ARTE DERECHA)
+            // ==========================================
+            const backgroundStyle = backgroundImageUrl
+                ? `background-image: linear-gradient(90deg, rgba(4,7,16,0.95) 0%, rgba(4,7,16,0.85) 45%, rgba(4,7,16,0.2) 80%, rgba(4,7,16,0.05) 100%), url('${backgroundImageUrl}'); background-size: cover; background-position: right center;`
+                : `background: linear-gradient(135deg, #0a0e1a 0%, #061126 50%, #031b33 100%);`;
+
+            html = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap');
+                    * { margin: 0; padding: 0; box-sizing: border-box; }
+                    body {
+                        width: ${width}px;
+                        height: ${height}px;
+                        ${backgroundStyle}
+                        display: flex;
+                        align-items: center;
+                        justify-content: flex-start;
+                        padding: 0 60px;
+                        overflow: hidden;
+                        font-family: 'Montserrat', 'Arial Black', sans-serif;
+                    }
+                    .text-column {
+                        max-width: 58%;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: flex-start;
+                        z-index: 10;
+                    }
+                    .badge-row {
+                        display: flex;
+                        gap: 12px;
+                        margin-bottom: 18px;
+                    }
+                    .badge {
+                        background: #00d4ff;
+                        color: #030712;
+                        font-size: 20px;
+                        font-weight: 900;
+                        padding: 6px 18px;
+                        border-radius: 8px;
+                        letter-spacing: 2px;
+                        text-transform: uppercase;
+                        box-shadow: 0 0 20px rgba(0,212,255,0.6);
+                    }
+                    .badge-secondary {
+                        background: rgba(255,255,255,0.15);
+                        border: 1px solid rgba(255,255,255,0.3);
+                        color: #ffffff;
+                        font-size: 18px;
+                        font-weight: 900;
+                        padding: 6px 16px;
+                        border-radius: 8px;
+                        letter-spacing: 1.5px;
+                        text-transform: uppercase;
+                        backdrop-filter: blur(10px);
+                    }
+                    .title {
+                        font-size: 58px;
+                        font-weight: 900;
+                        color: #ffffff;
+                        text-transform: uppercase;
+                        line-height: 1.08;
+                        letter-spacing: 1px;
+                        text-shadow: 
+                            3px 3px 0 #000,
+                            -3px -3px 0 #000,
+                            3px -3px 0 #000,
+                            -3px 3px 0 #000,
+                            0 10px 30px rgba(0,0,0,0.95);
+                    }
+                    .highlight {
+                        color: #00d4ff;
+                        text-shadow: 
+                            3px 3px 0 #000,
+                            -3px -3px 0 #000,
+                            0 0 35px rgba(0, 212, 255, 0.95);
+                    }
+                    .brand {
+                        position: absolute;
+                        bottom: 28px;
+                        left: 60px;
+                        font-size: 20px;
+                        font-weight: 900;
+                        color: #00d4ff;
+                        letter-spacing: 2.5px;
+                        text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="text-column">
+                    <div class="badge-row">
+                        <div class="badge">NUEVA IA</div>
+                        <div class="badge-secondary">GUÍA DEFINITIVA</div>
+                    </div>
+                    <div class="title">${highlightedTitle}</div>
+                </div>
+                <div class="brand">${brandName.toUpperCase()}</div>
+            </body>
+            </html>
+            `;
+        }
 
         const browser = await puppeteer.launch({
             headless: true,
@@ -268,7 +390,7 @@ export class ThumbnailGenerator {
             const page = await browser.newPage();
             await page.setViewport({ width, height });
             await page.setContent(html, { waitUntil: 'domcontentloaded', timeout: 30000 });
-            await new Promise(resolve => setTimeout(resolve, 800));
+            await new Promise(resolve => setTimeout(resolve, 1000));
             
             await page.screenshot({
                 path: outputPath,
@@ -287,7 +409,8 @@ export class ThumbnailGenerator {
         const keywords = [
             'IA', 'AI', 'AUTISMO', 'AUTISTA', 'AUTISTAS', 'TDAH', 'ADHD', 
             'CEREBRO', 'BRAIN', 'FUTURO', 'FUTURE', 'CHATGPT', 'CLAUDE',
-            'CRISIS', 'PREDICE', 'SECRETO', 'REVOLUCIÓN', 'GUÍA', 'MÉTODO', '7 DÍAS'
+            'CRISIS', 'PREDICE', 'SECRETO', 'REVOLUCIÓN', 'GUÍA', 'MÉTODO', 
+            '7 DÍAS', '48 HORAS', 'ANTI-CAOS', 'PRODUCTIVIDAD', 'ENFOQUE'
         ];
         let result = title.toUpperCase();
         
