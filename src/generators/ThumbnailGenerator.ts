@@ -24,8 +24,9 @@ export class ThumbnailGenerator {
     public static async generateThumbnail(config: ThumbnailConfig): Promise<string> {
         console.log(`🖼️ ThumbnailGenerator: Creando thumbnail para "${config.title}"...`);
         
+        const isLocalMode = process.env.VIDEO_SOURCE_MODE === 'comfyui';
         const apiKey = process.env.PEXELS_API_KEY;
-        if (!apiKey) {
+        if (!apiKey && !isLocalMode) {
             throw new Error('PEXELS_API_KEY is not set in .env');
         }
 
@@ -38,10 +39,11 @@ export class ThumbnailGenerator {
 
         let backgroundImageUrl = '';
 
-        try {
-            // 1. Search Pexels for a relevant background image
-            const searchQuery = config.visualPrompt || 'artificial intelligence technology';
-            const orientation = config.isShort ? 'portrait' : 'landscape';
+        if (!isLocalMode && apiKey) {
+            try {
+                // 1. Search Pexels for a relevant background image
+                const searchQuery = config.visualPrompt || 'artificial intelligence technology';
+                const orientation = config.isShort ? 'portrait' : 'landscape';
             
             let response = await axios.get(
                 `https://api.pexels.com/v1/search?query=${encodeURIComponent(searchQuery)}&orientation=${orientation}&per_page=5`,
@@ -64,8 +66,9 @@ export class ThumbnailGenerator {
                 backgroundImageUrl = photo.src.large2x || photo.src.large;
                 console.log(`📷 Using Pexels image ID ${photo.id} by ${photo.photographer}`);
             }
-        } catch (error: any) {
-            console.log(`⚠️ Pexels API error: ${error.message}, using gradient fallback`);
+            } catch (error: any) {
+                console.log(`⚠️ Pexels API error: ${error.message}, using gradient fallback`);
+            }
         }
 
         // 2. Generate thumbnail using Puppeteer (HTML to image)

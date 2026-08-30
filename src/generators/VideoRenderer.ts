@@ -255,14 +255,17 @@ export class VideoRenderer {
         // Limpiar cache de sesión periódicamente
         cleanupSessionCache();
         
+        const videoMode = ModelConfig.getVideoSourceMode();
+        const useRouter = videoMode === 'comfyui' || videoMode === 'hybrid';
+
         const apiKey = process.env.PEXELS_API_KEY;
-        if (!apiKey) {
+        if (!apiKey && videoMode !== 'comfyui') {
             throw new Error('PEXELS_API_KEY is not set in .env');
         }
 
         const headers = {
             ...VideoRenderer.DEFAULT_HEADERS,
-            'Authorization': apiKey
+            'Authorization': apiKey || ''
         };
 
         const audioPath = path.join(__dirname, '../../content', audioFilename);
@@ -279,10 +282,6 @@ export class VideoRenderer {
         if (promptsToUse.length === 0) promptsToUse.push('technology');
         while (promptsToUse.length < 3) promptsToUse.push(promptsToUse[0]); // asegurar 3 clips
 
-        // Obtener el modo de video configurado
-        const videoMode = ModelConfig.getVideoSourceMode();
-        const useRouter = videoMode === 'comfyui' || videoMode === 'hybrid';
-        
         logger.info('Modo de fuente de video para Short', { mode: videoMode, useRouter });
 
         for (let i = 0; i < promptsToUse.length; i++) {
@@ -337,8 +336,11 @@ export class VideoRenderer {
                     }
                 }
                 
-                // Fallback a Pexels si router no generó el clip
+                // Fallback a Pexels si router no generó el clip (solo si no estamos en modo comfyui)
                 if (!clipPath) {
+                    if (videoMode === 'comfyui') {
+                        throw new Error(`[VideoRenderer] Modo local 'comfyui' activo: no se permite fallback a Pexels y la generación local falló para escena ${i + 1}`);
+                    }
                     const tempVideoPath = path.join(__dirname, '../../content', `short_scene_${i}.mp4`);
                     
                     let response = await pexelsRetry.execute(
@@ -523,14 +525,17 @@ export class VideoRenderer {
         // Limpiar cache de sesión periódicamente
         cleanupSessionCache();
         
+        const videoMode = ModelConfig.getVideoSourceMode();
+        const useRouter = videoMode === 'comfyui' || videoMode === 'hybrid';
+
         const apiKey = process.env.PEXELS_API_KEY;
-        if (!apiKey) {
+        if (!apiKey && videoMode !== 'comfyui') {
             throw new Error('PEXELS_API_KEY is not set in .env');
         }
 
         const headers = {
             ...VideoRenderer.DEFAULT_HEADERS,
-            'Authorization': apiKey
+            'Authorization': apiKey || ''
         };
         
         const audioPath = path.join(__dirname, '../../content', audioFilename);
@@ -547,9 +552,6 @@ export class VideoRenderer {
         const estimatedDurationSeconds = promptsToUse.length * 30;
 
         // Obtener el modo de video configurado
-        const videoMode = ModelConfig.getVideoSourceMode();
-        const useRouter = videoMode === 'comfyui' || videoMode === 'hybrid';
-        
         logger.info('Modo de fuente de video para Long Video', { 
             mode: videoMode, 
             useRouter,
@@ -624,8 +626,11 @@ export class VideoRenderer {
                         }
                     }
                     
-                    // Fallback a Pexels si router no generó el clip
+                    // Fallback a Pexels si router no generó el clip (solo si no estamos en modo comfyui)
                     if (!clipPath) {
+                        if (videoMode === 'comfyui') {
+                            throw new Error(`[VideoRenderer] Modo local 'comfyui' activo: no se permite fallback a Pexels y la generación local falló para escena ${i + 1}`);
+                        }
                         // REQ-4.4.2: Aplicar retry con backoff exponencial a llamadas Pexels
                         let response = await pexelsRetry.execute(
                             () => axios.get(`https://api.pexels.com/videos/search?query=${encodeURIComponent(prompt)}&orientation=landscape&per_page=15`, { headers }),
