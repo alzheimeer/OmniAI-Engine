@@ -111,10 +111,12 @@ Tras una auditoría exhaustiva del sistema original, se detectó que el algoritm
 
 1. **Evasión de Horarios Robóticos (Colas BullMQ Asíncronas):** El sistema anterior publicaba a horas fijas exactas (ej. 10:00 AM). YouTube penaliza este comportamiento robótico. Ahora, aunque el orquestador se active a las 10:00 AM y renderice el video en la **`ContentQueue`**, la publicación real se envía a la **`PublishQueue`** con el **`MultiPlatformDispatcher`** aplicando un **retraso aleatorio (de 0 a 45 minutos)**. Así, el video se publicará a horas impredecibles (ej. 10:23 AM o 10:41 AM), simulando el comportamiento de un humano presionando "Publicar", sin bloquear el servidor.
 2. **Evasión de Huellas Visuales (Contenido Reutilizado):** Anteriormente, los videos e imágenes (o GIFs) obtenidos de Pexels se unían tal cual con el guion del SEO. YouTube tiene identificados esos archivos exactos (hashes). La solución es el **`Video Transformer`**, que altera dinámicamente cada clip (zoom, crop, filtros sutiles) y le asigna un Hash Único en los metadatos antes de pasarlo al `Video Renderer`. El **`Thumbnail Transformer`** hace exactamente lo mismo (sincronizando el ruido y el cromatismo) para las miniaturas.
-3. **Evasión de Huellas de Audio y Voz AI:** Las voces generadas por IA también son detectables y la música gratuita sufre ataques de Content ID. 
-   - El **`Audio Generator`** ahora implementa SSML para humanizar las pausas y tono, divide textos grandes en trozos pequeños (*Chunking*), y aplica una **Rotación Aleatoria de Voces Premium** (Neural2/Chirp/Journey) para que cada video suene con un locutor distinto y evite huellas acústicas repetitivas.
-   - El **`Music Transformer`** altera aleatoriamente el Pitch, Tempo y Ecualización (EQ) de la música de fondo.
-   - Ambos fluyen hacia el **`AudioMixer`**, donde se normalizan profesionalmente (con atenuación automática o *ducking* cuando hay voz) antes de unirse al video final.
+3. **Evasión de Huellas de Audio y Masterización Broadcast (EBU R128):** 
+   - El **`Audio Generator`** implementa síntesis a **velocidad humana natural (1.0x, ~140 wpm)** con retención de pausas y respiración natural en la puntuación, eliminando compresiones artificiales o aceleraciones mecánicas.
+   - Aplica **Masterización de Estudio Broadcast (`loudnorm=I=-16:TP=-1.5:LRA=11`)** y compresión dinámica suave para un timbre vocal cálido, potente y claro.
+   - Rotación Aleatoria de Voces Premium Multi-Voz (`[VOICE_A]` y `[VOICE_B]` con Neural2/Journey).
+   - El **`SoundDesignEngine`** ecualiza las frecuencias vocales (`highpass=80Hz`, `lowpass=12kHz`) y mezcla pistas ambientales suaves atenuadas a `-22dB`.
+   - El **`SubtitleGenerator`** adapta los subtítulos dinámicos de forma responsiva: estilo flotante central 110pt para Shorts (9:16) y franja cinematográfica inferior 54pt para Videos Largos (16:9).
 4. **Memoria y Creatividad del `SEOAgent`:** El cerebro del contenido no solo genera las ideas, sino que evita la monotonía. Antes, podía sugerir videos repetitivos. Ahora, consulta la base de datos (SQLite), carga el hash de los últimos 50 temas abordados y le instruye al LLM (DeepSeek) que evite la duplicación estructural y temática, asegurando originalidad constante.
 
 ## 📅 Calendario de Contenido

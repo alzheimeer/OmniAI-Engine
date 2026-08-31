@@ -42,26 +42,24 @@ El código fuente se encuentra en `src/`:
     - Asignación automática de estilos visuales por tipo de contenido
 - **`BlogGenerator.ts`**: Redacta artículos de más de 1000 palabras en Markdown listos para ser publicados, aplicando la estrategia del `SEOAgent`.
 - **`AudioGenerator.ts`**: Conecta con Google Cloud TTS para sintetizar la voz del guion generado.
-  - **NUEVO (Agosto 2026):** Sistema de chunking automático:
-    - Límite de Google TTS: 5000 bytes por request
-    - Si el script excede el límite, se divide en chunks por oraciones
-    - Cada chunk se sintetiza individualmente
-    - Los archivos de audio se concatenan con FFmpeg
-    - Limpieza automática de archivos temporales
-  - **NUEVO (Agosto 2026):** Rotación Aleatoria de Voces Premium:
-    - Evita huellas acústicas usando distintas voces (Neural2/Chirp/Journey)
-    - Balance de géneros por idioma (es-ES, en-US, pt-BR)
+  - **Velocidad Natural (1.0x):** Configurado a ritmo conversacional humano (~140 wpm), respetando pausas y respiraciones de puntuación sin recortes acelerados.
+  - **Masterización Broadcast:** Filtro FFmpeg `loudnorm=I=-16:TP=-1.5:LRA=11` (estándar EBU R128 de YouTube) + compresor dinámico para máxima presencia, claridad y calidez vocal.
+  - **Sistema de Chunking:** Divide guiones largos por oraciones respetando el límite de 1800 bytes y los une con `_concat_list.txt`.
+  - **Rotación Multi-Voz:** Soporta `[VOICE_A]` y `[VOICE_B]` para dinámicas de podcast/diálogo con voces Neural2 y Journey.
+- **`SubtitleGenerator.ts`**: **ACTUALIZADO (Agosto 2026)** - Motor de subtítulos dinámicos responsivos:
+  - **Shorts (9:16):** Subtítulos animados flotantes en el centro (110pt) con giros y zooms cinéticos.
+  - **Videos Largos (16:9):** Subtítulos inferiores elegantes (54pt) con fundidos suaves y posicionamiento cinematográfico.
 - **`VideoRenderer.ts`**: Automatiza la obtención de videos de fondo y utiliza `FFmpeg` para superponer el audio y renderizar.
-  - **NUEVO (Agosto 2026):** Modo `hibridoTigre` que combina 70% video real Pexels + 30% conceptos IA con Ken Burns + Sound Design atenuado (-22dB)
+  - **NUEVO (Agosto 2026):** Modo `hibridoTigre` que combina 70% video real Pexels + 30% conceptos IA con Ken Burns + Sound Design atenuado (-22dB) + Subtítulos responsivos 16:9
   - Integración con `VideoSourceRouter` para fuentes múltiples (ComfyUI, Pexels, Pool)
   - Caché de sesión para evitar repetición de clips dentro del mismo video
   - Soporte para campo `sourceUsed` en metadatos de segmentos
 - **`KenBurnsEngine.ts`**: **NUEVO (Agosto 2026)** - Convierte imágenes estáticas de IA en clips de video animados Full HD de 3.2s:
   - Efectos: `zoom-in` suave (1.0 ➔ 1.25), `zoom-out` (1.25 ➔ 1.0) y paneos laterales a 30fps
   - Optimización de color: Contraste 1.15 y saturación 1.1 para acabado cinemático
-- **`SoundDesignEngine.ts`**: **NUEVO (Agosto 2026)** - Motor de diseño sonoro profesional:
-  - Genera y mezcla pistas ambientales suaves de fondo atenuadas a `-22dB` bajo la voz en off
-  - Proporciona atmósfera de podcast/documental sin opacar la narración
+- **`SoundDesignEngine.ts`**: **ACTUALIZADO (Agosto 2026)** - Motor de diseño sonoro profesional:
+  - Aplica ecualización vocal de alta definición (`highpass=80Hz`, `lowpass=12kHz`)
+  - Mezcla pistas de música ambiental atenuadas a `-22dB` sin generar ruidos ni distorsiones armónicas
 - **`ThumbnailGenerator.ts`**: **NUEVO (Versión 2026)** - Generador de miniaturas de alto CTR:
   - **Prompt Engineering 2026:** Estructura visual anti-"AI sameness", eliminando flechas rojas y caras genéricas
   - **Diseño Asimétrico 16:9:** Regla de tercios con texto en gradiente izquierdo (40%) y arte libre de alta definición (60% derecho)
