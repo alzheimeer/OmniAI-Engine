@@ -12,18 +12,19 @@ OmniAI-Engine es un motor de Inteligencia Artificial totalmente autónomo diseñ
 - **Analytics Engine (El Científico):** Se conecta a la API de Datos de YouTube v3 para obtener conteo de suscriptores, vistas de videos y likes en tiempo real, retroalimentando al SEO Agent.
 - **Script & Blog Generators (Los Escritores):** Escribe cortos atractivos de 60s, documentales de 5m y artículos markdown de más de 1000 palabras sobre Inteligencia Artificial y Neurodiversidad.
 - **Audio Generator (La Voz):** Usa Google Cloud TTS para voces superpuestas con **división automática de texto (chunking)** para manejar guiones que exceden el límite de 5000 bytes de la API.
-- **Video Renderer (El Estudio):** Obtiene material de video de archivo de Pexels (con resiliencia de búsqueda de respaldo) y renderiza videos en 1080p con FFmpeg. **NUEVO:** Integración con `VideoSourceRouter` para múltiples fuentes de video.
-- **ComfyUI Video Generation (El Artista IA):** Genera videos con IA local usando **ComfyUI con modelos Wan 2.2**. Incluye:
+- **Video Renderer (El Estudio):** Obtiene material de video de archivo de Pexels (con resiliencia de búsqueda de respaldo) y renderiza videos en 1080p con FFmpeg. **NUEVO:** Integración con `VideoSourceRouter` y modo de alta retención `hibridoTigre`.
+- **Modo hibridoTigre (NUEVO Agosto 2026):** Modo de video de alta retención que combina **70% video real de Pexels** + **30% imágenes de conceptos IA con animación Ken Burns (`zoompan` de FFmpeg a 30fps)** + **Sound Design** con música ambiental atenuada a `-22dB` + subtítulos cinéticos. 100% reversible vía `.env` (`VIDEO_SOURCE_MODE=hibridoTigre` vs `VIDEO_SOURCE_MODE=pexels`).
+- **ComfyUI Video Generation (El Artista IA):** Genera videos con IA local usando **ComfyUI con modelos Wan 2.2 y FLUX.1**. Incluye:
   - **T2V (Text-to-Video):** Generación desde texto para pool de clips
   - **I2V (Image-to-Video):** Anima imágenes para segmentos KEY (intro/outro) con control visual preciso
-  - **VideoSourceRouter:** Modo `hybrid` (ComfyUI para KEY, Pool/Pexels para FILLER)
+  - **VideoSourceRouter:** Modos `hibridoTigre`, `hybrid`, `pexels`, `comfyui`
   - **ClipPoolManager:** Pool de clips pre-generados en 6 categorías
   - **3 estilos visuales:** `cinemagraph_plotagraph`, `moody_lofi_ambient`, `analog_horror_liminal`
   - **Pollinations.ai Fallback:** API gratuita sin límites para imágenes
 - **Cambios de Seguridad (Agosto 2026):**
   - **Glitch RGB (0.5s):** Reemplaza strobing epiléptico de 3s. Efecto de aberración cromática 100% seguro.
   - **Formant Shift:** Reemplaza `atempo=1.02`. Altera timbre de voz sin cambiar velocidad, indetectable por YouTube.
-- **Thumbnail Generator:** Crea miniaturas personalizadas con prompts visuales para un mejor CTR.
+- **Thumbnail Generator 2026:** Miniaturas de alto CTR con **Prompt Engineering 2026** anti-uniformidad visual, regla de tercios asimétrica para YouTube horizontal 16:9 (`1280x720`) y tarjetas compactas para Shorts 9:16 (`1080x1920`), con failover multinivel: Google Gemini/Imagen 3 ➔ Flux Cloud / Turbo AI ➔ Pexels API ➔ Degradado.
 - **Multi-Platform Publishers (Los Distribuidores):** 
   - **YouTube:** Subida con OAuth2 y **sanitización de etiquetas (tags)** para cumplimiento de la API.
   - **Plataformas de Blog:** Envío simultáneo a **Hashnode**, **Medium** y **Dev.to** (Actualmente pausado bajo demanda mediante bandera `ENABLE_BLOG_PUBLISHING=false` en el archivo `.env` por estrictas políticas de detección de bots en Hashnode/Medium).
@@ -222,9 +223,19 @@ Para Asistentes de IA y mantenedores, consulta `CLAUDE.md` y `GEMINI.md` en el d
 
 ## Actualizaciones Recientes: V2 Optimización Integral (Agosto 2026)
 
-- ✅ **Generación de Video con IA Local (ComfyUI) (NUEVO):**
-  - Integración completa con **ComfyUI y modelos Wan 2.2** para generación de video Text-to-Video (T2V) e Image-to-Video (I2V)
-  - **VideoSourceRouter** con 3 modos: `comfyui` (solo IA), `pexels` (solo stock), `hybrid` (inteligente, default)
+- ✅ **Modo de Video 'hibridoTigre' y Sound Design (NUEVO):**
+  - **Fórmula de Retención 70/30:** Combina 70% video real de Pexels con 30% imágenes de conceptos IA.
+  - **KenBurnsEngine (`src/generators/KenBurnsEngine.ts`):** Convierte imágenes estáticas de IA en clips fluidos Full HD de 3.2s con zoom cinematográfico suave (`zoom-in` / `zoom-out` 1.0 ➔ 1.25) y paneos a 30fps.
+  - **SoundDesignEngine (`src/generators/SoundDesignEngine.ts`):** Añade diseño sonoro con música ambiental relajante atenuada a `-22dB` bajo la voz en off.
+  - **Reversibilidad Inmediata:** Configurable en `.env` mediante `VIDEO_SOURCE_MODE=hibridoTigre` (o `pexels` para volver en cualquier momento).
+- ✅ **Motor de Miniaturas IA 2026 (`src/generators/ThumbnailGenerator.ts`) (NUEVO):**
+  - **Prompt Engineering 2026:** Estructura visual avanzada anti-"AI sameness", eliminando flechas rojas y caras genéricas.
+  - **Diseño Asimétrico 16:9:** Regla de tercios con texto en gradiente izquierdo (40%) y arte libre de alta definición (60% derecho).
+  - **Formato Vertical 9:16:** Tarjetas compactas flotantes para Shorts.
+  - **Failover Multi-Nivel:** Google Gemini / Imagen 3 ➔ Flux Cloud / Turbo AI ➔ Pexels API ➔ Degradado.
+- ✅ **Generación de Video con IA Local (ComfyUI):**
+  - Integración completa con **ComfyUI y modelos Wan 2.2 / FLUX.1 Schnell GGUF** para generación de video Text-to-Video (T2V) e Image-to-Video (I2V)
+  - **VideoSourceRouter** con modos: `hibridoTigre`, `comfyui` (solo IA), `pexels` (solo stock), `hybrid` (inteligente, default)
   - **ClipPoolManager** con 6 categorías: nature, technology, business, abstract, lifestyle, urban
   - **3 estilos visuales:** `cinemagraph_plotagraph` (producto), `moody_lofi_ambient` (educativo), `analog_horror_liminal` (hooks)
   - **ComfyUIHealthMonitor** con health checks cada 60s y auto-reinicio en crashes

@@ -52,17 +52,22 @@ El código fuente se encuentra en `src/`:
     - Evita huellas acústicas usando distintas voces (Neural2/Chirp/Journey)
     - Balance de géneros por idioma (es-ES, en-US, pt-BR)
 - **`VideoRenderer.ts`**: Automatiza la obtención de videos de fondo y utiliza `FFmpeg` para superponer el audio y renderizar.
-  - **NUEVO (Agosto 2026):** Integración con `VideoSourceRouter` para fuentes múltiples (ComfyUI, Pexels, Pool)
+  - **NUEVO (Agosto 2026):** Modo `hibridoTigre` que combina 70% video real Pexels + 30% conceptos IA con Ken Burns + Sound Design atenuado (-22dB)
+  - Integración con `VideoSourceRouter` para fuentes múltiples (ComfyUI, Pexels, Pool)
   - Caché de sesión para evitar repetición de clips dentro del mismo video
   - Soporte para campo `sourceUsed` en metadatos de segmentos
-- **`ThumbnailGenerator.ts`**: **NUEVO** - Genera thumbnails personalizados para YouTube usando Puppeteer + Pexels API:
-  - Busca imagen de fondo relevante en Pexels basada en `visualPrompt`
-  - Renderiza HTML/CSS a imagen JPEG con Puppeteer (sin dependencias nativas como sharp)
-  - Texto con fuente Montserrat 900, sombras y contorno negro
-  - Palabras clave (IA, AUTISMO, TDAH, CEREBRO, CHATGPT) resaltadas en cyan (#00d4ff)
-  - Branding "NeuroSync AI" en esquina inferior derecha
-  - Dimensiones: 1280x720 (videos largos) o 1080x1920 (Shorts)
-  - Fallback a gradiente si Pexels falla
+- **`KenBurnsEngine.ts`**: **NUEVO (Agosto 2026)** - Convierte imágenes estáticas de IA en clips de video animados Full HD de 3.2s:
+  - Efectos: `zoom-in` suave (1.0 ➔ 1.25), `zoom-out` (1.25 ➔ 1.0) y paneos laterales a 30fps
+  - Optimización de color: Contraste 1.15 y saturación 1.1 para acabado cinemático
+- **`SoundDesignEngine.ts`**: **NUEVO (Agosto 2026)** - Motor de diseño sonoro profesional:
+  - Genera y mezcla pistas ambientales suaves de fondo atenuadas a `-22dB` bajo la voz en off
+  - Proporciona atmósfera de podcast/documental sin opacar la narración
+- **`ThumbnailGenerator.ts`**: **NUEVO (Versión 2026)** - Generador de miniaturas de alto CTR:
+  - **Prompt Engineering 2026:** Estructura visual anti-"AI sameness", eliminando flechas rojas y caras genéricas
+  - **Diseño Asimétrico 16:9:** Regla de tercios con texto en gradiente izquierdo (40%) y arte libre de alta definición (60% derecho)
+  - **Formato Vertical 9:16:** Tarjetas compactas flotantes para Shorts
+  - **Failover Multi-Nivel:** Google Gemini / Imagen 3 ➔ Flux Cloud / Turbo AI ➔ Pexels API ➔ Degradado
+  - Texto con fuente Montserrat 900, palabras clave en cyan neón (`#00d4ff`) y branding "NeuroSync AI"
 - **`QueueManager.ts`** y **`WorkerManager.ts`**: **NUEVO** - Gestión de colas asíncrona usando **BullMQ** conectado a Redis. Garantiza la ejecución secuencial (`concurrency: 1`) en `ContentQueue` para trabajos pesados (FFmpeg) para evitar el agotamiento de recursos (OOM) en el contenedor, e implementa `PublishQueue` (`concurrency: 5`) para la distribución y subida de videos de forma no bloqueante.
 
 ### 2.1 Sistema de Generación de Video con IA Local (ComfyUI) - NUEVO Agosto 2026
@@ -105,10 +110,11 @@ El sistema ahora soporta **generación local de video con IA** usando **ComfyUI 
   - Selección inteligente evitando clips usados recientemente
   - Reposición automática cuando el pool baja de umbral
 
-- **`src/comfyui/VideoSourceRouter.ts`**: Orquestador de fuentes de video con 3 modos:
-  - **`comfyui`:** Solo ComfyUI, 2 reintentos, error si falla
-  - **`pexels`:** Solo Pexels, fallback sintético
+- **`src/comfyui/VideoSourceRouter.ts`**: Orquestador de fuentes de video:
+  - **`hibridoTigre` (NUEVO):** 70% Pexels stock + 30% IA Ken Burns + Sound Design atenuado (-22dB) + Subtítulos dinámicos
   - **`hybrid` (default):** Segmentos clave → ComfyUI, Relleno → Pool/Pexels, cadena de fallback automática
+  - **`pexels`:** Solo Pexels, fallback sintético
+  - **`comfyui`:** Solo ComfyUI, 2 reintentos, error si falla
 
 - **`src/comfyui/VideoGenerationError.ts`**: Manejo de errores estructurado:
   - Códigos de error específicos (COMFYUI_UNAVAILABLE, GENERATION_TIMEOUT, etc.)
@@ -118,7 +124,7 @@ El sistema ahora soporta **generación local de video con IA** usando **ComfyUI 
 #### Variables de Entorno Clave:
 
 ```env
-VIDEO_SOURCE_MODE=hybrid              # comfyui | pexels | hybrid
+VIDEO_SOURCE_MODE=hibridoTigre        # hibridoTigre | pexels | hybrid | comfyui
 COMFYUI_MODEL=wan22_5B               # wan22_5B | wan21_1_3B
 COMFYUI_PATH=D:\ComfyUI              # Ruta local a ComfyUI
 COMFYUI_URL=http://127.0.0.1:8188   # URL del servidor ComfyUI

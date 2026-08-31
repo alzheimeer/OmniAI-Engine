@@ -22,33 +22,38 @@ El código fuente se encuentra en `src/`:
 - **`ScriptGenerator.ts`**: Redacta guiones para Shorts y Videos Largos aplicando la estrategia del `SEOAgent`. Genera prompts duales: `visualPrompts` (keywords Pexels) y `comfyPrompts` (descripciones 20-50 palabras para ComfyUI).
 - **`BlogGenerator.ts`**: Redacta artículos de más de 1000 palabras en Markdown listos para ser publicados, aplicando la estrategia del `SEOAgent`.
 - **`AudioGenerator.ts`**: Conecta con Google Cloud TTS para sintetizar la voz del guion generado. Integra **rotación aleatoria de voces Premium** (Neural2/Chirp/Journey) para evadir la detección algorítmica de audios robóticos y divide textos largos en chunks automáticamente.
-- **`VideoRenderer.ts`**: Obtiene videos de fondo y renderiza con `FFmpeg`. Integrado con `VideoSourceRouter` para fuentes múltiples.
-- **`PollinationsClient.ts`**: **(NUEVO)** Cliente para la API gratuita de Pollinations.ai. Genera imágenes sin API key ni límites. Usado como fallback cuando ComfyUI no está disponible, o para generar imágenes de referencia para I2V.
+- **`VideoRenderer.ts`**: Obtiene videos de fondo y renderiza con `FFmpeg`. Integrado con modo `hibridoTigre` (70% Pexels + 30% IA Ken Burns + Sound Design a -22dB).
+- **`KenBurnsEngine.ts`**: **(NUEVO)** Anima imágenes fijas de IA con zoom suave (1.0 ➔ 1.25) y paneos a 30fps para convertirlas en clips de video cinemáticos.
+- **`SoundDesignEngine.ts`**: **(NUEVO)** Mezcla pista musical ambiental atenuada a `-22dB` bajo la locución para lograr atmósfera inmersiva tipo podcast/documental.
+- **`ThumbnailGenerator.ts`**: **(NUEVO Versión 2026)** Generador de miniaturas de alto CTR con **Prompt Engineering 2026** anti-"AI sameness", regla de tercios asimétrica 16:9 (`1280x720`) y tarjetas compactas 9:16 (`1080x1920`). Failover: Google Gemini/Imagen ➔ Flux Cloud / Turbo AI ➔ Pexels API ➔ Degradado.
+- **`PollinationsClient.ts`**: Cliente para la API gratuita de Pollinations.ai. Genera imágenes sin API key ni límites. Usado como fallback cuando ComfyUI no está disponible, o para generar imágenes de referencia para I2V.
 - **`QueueManager.ts`** y **`WorkerManager.ts`**: Gestión de colas asíncrona usando **BullMQ** conectado a Redis. Garantiza la ejecución secuencial (`concurrency: 1`) en `ContentQueue` de trabajos pesados (FFmpeg) y usa `PublishQueue` (`concurrency: 5`) para evadir la detección de horarios aplicando retrasos de publicación aleatorios.
 
 ### 2.1 Sistema de Generación de Video con IA Local (ComfyUI) - Agosto 2026
 
-El sistema soporta **generación local de video con IA** usando **ComfyUI con modelos Wan 2.2**, reduciendo dependencia de videos de stock.
+El sistema soporta **generación local de video con IA** usando **ComfyUI con modelos Wan 2.2 y FLUX.1**, reduciendo dependencia de videos de stock.
 
 #### Componentes Clave:
 
-- **`ModelConfig.ts`**: Singleton con modelos (`wan22_5B`, `wan21_1_3B`), resoluciones y 3 estilos visuales
+- **`ModelConfig.ts`**: Singleton con modelos (`wan22_5B`, `wan21_1_3B`), resoluciones, estilos visuales y modos (`hibridoTigre`, `hybrid`, `pexels`, `comfyui`)
 - **`ComfyUIProcessManager.ts`**: Gestión del proceso con auto-reinicio (máx 3 reintentos)
 - **`ComfyUIHealthMonitor.ts`**: Health checks cada 60s, marca no disponible tras 3 fallos
 - **`ComfyUIClient.ts`**: Cliente T2V/I2V con soporte de VideoType y estilos visuales
 - **`ClipDatabase.ts`**: SQLite (better-sqlite3) para clips pre-generados con tracking de uso
 - **`ClipPoolManager.ts`**: Pool con 6 categorías (nature, technology, business, abstract, lifestyle, urban)
-- **`VideoSourceRouter.ts`**: Orquestador con 3 modos:
-  - `comfyui`: Solo ComfyUI, 2 reintentos
-  - `pexels`: Solo Pexels, fallback sintético
+- **`VideoSourceRouter.ts`**: Orquestador con modos:
+  - `hibridoTigre` (NUEVO): 70% Pexels stock + 30% IA Ken Burns + Sound Design a -22dB
   - `hybrid` (default): Key segments → I2V/ComfyUI, Filler → Pool/Pexels
+  - `pexels`: Solo Pexels, fallback sintético
+  - `comfyui`: Solo ComfyUI, 2 reintentos
 - **`VideoGenerationError.ts`**: Errores estructurados con códigos y flags de recuperabilidad
-- **`PollinationsClient.ts`**: **(NUEVO)** Fallback gratuito para generación de imágenes (sin API key, sin límites)
+- **`PollinationsClient.ts`**: Fallback gratuito para generación de imágenes (sin API key, sin límites)
 
 #### Modos de Generación de Video:
 
 | Modo | Descripción | Uso |
 |------|-------------|-----|
+| **hibridoTigre** (NUEVO) | 70% Stock Pexels + 30% IA Ken Burns + Sound Design -22dB | Máxima retención en YouTube, ritmo dinámico y diferenciación |
 | **T2V (Text-to-Video)** | Genera video directamente desde prompt de texto | Pool de clips, segmentos de relleno |
 | **I2V (Image-to-Video)** | Anima una imagen estática con movimiento controlado | Segmentos KEY (intro/outro), mayor control visual |
 
@@ -62,7 +67,7 @@ El sistema soporta **generación local de video con IA** usando **ComfyUI con mo
 
 #### Variables de Entorno:
 ```env
-VIDEO_SOURCE_MODE=hybrid    # comfyui | pexels | hybrid
+VIDEO_SOURCE_MODE=hibridoTigre    # hibridoTigre | pexels | hybrid | comfyui
 COMFYUI_MODEL=wan22_5B     # wan22_5B | wan21_1_3B
 COMFYUI_PATH=D:\ComfyUI
 COMFYUI_URL=http://127.0.0.1:8188
