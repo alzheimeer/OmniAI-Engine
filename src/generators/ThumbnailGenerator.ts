@@ -50,7 +50,7 @@ export class ThumbnailGenerator {
     /**
      * Obtiene una imagen de fondo de alta calidad usando Google Imagen / Flux AI / Pollinations / Pexels
      */
-    private static async fetchBackgroundImage(
+    public static async fetchBackgroundImage(
         title: string, 
         visualPrompt: string | undefined, 
         isShort: boolean, 

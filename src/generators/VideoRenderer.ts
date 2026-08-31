@@ -17,6 +17,8 @@ import { ComfyUIClient } from './ComfyUIClient';
 import { ComfyUIHealthMonitor } from './ComfyUIHealthMonitor';
 
 import { ContentGarbageCleaner } from '../utils/ContentGarbageCleaner';
+import { KenBurnsEngine } from './KenBurnsEngine';
+import { SoundDesignEngine } from './SoundDesignEngine';
 
 // Set the path to the ffmpeg binary from the installer package
 ffmpeg.setFfmpegPath(ffmpegInstaller.path);
@@ -223,6 +225,47 @@ export class VideoRenderer {
     }
 
     /**
+     * Genera un clip animado de IA con efecto Ken Burns para el modo hibridoTigre.
+     */
+    private static async fetchFluxKenBurnsClip(prompt: string, isShort: boolean, sceneIndex: number, videoId: string): Promise<string> {
+        const tempImgPath = path.join(__dirname, '../../content', `_flux_img_${videoId}_${sceneIndex}.jpg`);
+        const tempClipPath = path.join(__dirname, '../../content', `_flux_clip_${videoId}_${sceneIndex}.mp4`);
+        
+        try {
+            logger.info(`[hibridoTigre] Generando imagen conceptual IA con Ken Burns para escena ${sceneIndex + 1}`, { prompt });
+            const width = isShort ? 1080 : 1920;
+            const height = isShort ? 1920 : 1080;
+            const bgResult = await ThumbnailGenerator.fetchBackgroundImage(prompt, 'futuristic cyan neural tech concept', isShort, width, height);
+            
+            if (bgResult.startsWith('data:image')) {
+                const b64Data = bgResult.replace(/^data:image\/\w+;base64,/, '');
+                fs.writeFileSync(tempImgPath, Buffer.from(b64Data, 'base64'));
+            } else if (bgResult.startsWith('http')) {
+                const dlRes = await axios.get(bgResult, { responseType: 'arraybuffer', timeout: 15000 });
+                fs.writeFileSync(tempImgPath, dlRes.data);
+            } else {
+                throw new Error('No background image generated');
+            }
+            
+            const effect = sceneIndex % 2 === 0 ? 'zoom-in' : 'zoom-out';
+            await KenBurnsEngine.animateImage({
+                inputImagePath: tempImgPath,
+                outputVideoPath: tempClipPath,
+                durationSeconds: 3.2,
+                isShort,
+                effect
+            });
+            
+            if (fs.existsSync(tempImgPath)) fs.unlinkSync(tempImgPath);
+            return tempClipPath;
+        } catch (e: any) {
+            logger.warn(`Error en fetchFluxKenBurnsClip para escena ${sceneIndex + 1}`, { error: e.message });
+            if (fs.existsSync(tempImgPath)) fs.unlinkSync(tempImgPath);
+            throw e;
+        }
+    }
+
+    /**
      * Renders a YouTube Short video with background clips and audio.
      * Uses VideoSourceRouter to select video source according to configured mode.
      * 
@@ -292,8 +335,18 @@ export class VideoRenderer {
                 let clipPath: string | null = null;
                 let sourceUsed: 'comfyui' | 'pexels' | 'pool' | 'synthetic' = 'pexels';
                 
+                // Modo hibridoTigre: 30% escenas de IA conceptual con Ken Burns (ej. intro o múltiplos de 3)
+                if (videoMode === 'hibridoTigre' && i % 3 === 0) {
+                    try {
+                        clipPath = await VideoRenderer.fetchFluxKenBurnsClip(prompt, true, i, trackingVideoId);
+                        sourceUsed = 'synthetic';
+                    } catch (e: any) {
+                        logger.warn(`[hibridoTigre] Fallback a Pexels para escena Short ${i + 1}`, { error: e.message });
+                    }
+                }
+
                 // Intentar usar VideoSourceRouter si está habilitado (Requirement 6.2)
-                if (useRouter) {
+                if (!clipPath && useRouter) {
                     try {
                         const router = getVideoSourceRouter();
                         
@@ -450,13 +503,28 @@ export class VideoRenderer {
             logger.warn('No se pudo insertar escena de portada al Short, continuando con concat estándar', { error: coverErr.message });
         }
 
-        logger.info('Videos concatenados. Mezclando audio, video y subtítulos con FFmpeg');
+        let audioToUse = audioPath;
+        let soundDesignFile: string | null = null;
+        if (videoMode === 'hibridoTigre') {
+            try {
+                soundDesignFile = path.join(__dirname, '../../content', `_sd_${trackingVideoId}.aac`);
+                audioToUse = await SoundDesignEngine.processAudio({
+                    voiceAudioPath: audioPath,
+                    outputAudioPath: soundDesignFile,
+                    musicVolumeDb: -22
+                });
+            } catch (sdErr: any) {
+                logger.warn('SoundDesignEngine falló para Short, usando audio original', { error: sdErr.message });
+            }
+        }
+
+        logger.info('Videos concatenados. Mezclando audio, video y subtítulos con FFmpeg', { audioToUse });
         
         return new Promise((resolve, reject) => {
             ffmpeg()
                 .input(videoInputToUse)
                 .inputOptions(['-stream_loop -1'])
-                .input(audioPath)
+                .input(audioToUse)
                 .outputOptions([
                     '-c:v libx264',
                     '-preset ultrafast',
@@ -477,6 +545,7 @@ export class VideoRenderer {
                     if (fs.existsSync(concatListFile)) fs.unlinkSync(concatListFile);
                     if (fs.existsSync(concatVideoPath)) fs.unlinkSync(concatVideoPath);
                     if (fs.existsSync(coverVideoPath)) fs.unlinkSync(coverVideoPath);
+                    if (soundDesignFile && fs.existsSync(soundDesignFile)) fs.unlinkSync(soundDesignFile);
                     const finalVideoWithCover = path.join(__dirname, '../../content', `_short_final_base_${trackingVideoId}.mp4`);
                     if (fs.existsSync(finalVideoWithCover)) fs.unlinkSync(finalVideoWithCover);
                     
@@ -570,9 +639,19 @@ export class VideoRenderer {
                 let clipPath: string | null = null;
                 let sourceUsed: 'comfyui' | 'pexels' | 'pool' | 'synthetic' = 'pexels';
 
+                // Modo hibridoTigre: 30% escenas de IA conceptual con Ken Burns (ej. intro o múltiplos de 3)
+                if (videoMode === 'hibridoTigre' && i % 3 === 0) {
+                    try {
+                        clipPath = await VideoRenderer.fetchFluxKenBurnsClip(prompt, false, i, trackingVideoId);
+                        sourceUsed = 'synthetic';
+                    } catch (e: any) {
+                        logger.warn(`[hibridoTigre] Fallback a Pexels para escena Long ${i + 1}`, { error: e.message });
+                    }
+                }
+
                 try {
                     // Intentar usar VideoSourceRouter si está habilitado (Requirement 6.3)
-                    if (useRouter) {
+                    if (!clipPath && useRouter) {
                         try {
                             const router = getVideoSourceRouter();
                             
@@ -770,11 +849,26 @@ export class VideoRenderer {
             const concatContent = concatLines.join('\n');
             fs.writeFileSync(concatListPath, concatContent);
 
+            let audioToUse = audioPath;
+            let soundDesignFile: string | null = null;
+            if (videoMode === 'hibridoTigre') {
+                try {
+                    soundDesignFile = path.join(__dirname, '../../content', `_sd_${trackingVideoId}.aac`);
+                    audioToUse = await SoundDesignEngine.processAudio({
+                        voiceAudioPath: audioPath,
+                        outputAudioPath: soundDesignFile,
+                        musicVolumeDb: -22
+                    });
+                } catch (sdErr: any) {
+                    logger.warn('SoundDesignEngine falló para Long Video, usando audio original', { error: sdErr.message });
+                }
+            }
+
             return new Promise((resolve, reject) => {
                 ffmpeg()
                     .input(concatListPath)
                     .inputOptions(['-f concat', '-safe 0'])
-                    .input(audioPath)
+                    .input(audioToUse)
                     .outputOptions([
                         '-c:v libx264',
                         '-preset ultrafast',
@@ -789,6 +883,7 @@ export class VideoRenderer {
                         logger.info(`Long Video render completo`, { outputPath, videoId: trackingVideoId });
                         downloadedVideos.forEach(vid => { if (fs.existsSync(vid)) fs.unlinkSync(vid); });
                         if (fs.existsSync(concatListPath)) fs.unlinkSync(concatListPath);
+                        if (soundDesignFile && fs.existsSync(soundDesignFile)) fs.unlinkSync(soundDesignFile);
 
                         // Ejecutar limpieza automatizada de basura residual
                         ContentGarbageCleaner.cleanTemporaryFiles();

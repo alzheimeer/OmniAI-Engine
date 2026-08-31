@@ -26,7 +26,7 @@ export type WanModelType = 'wan22_5B' | 'wan21_1_3B';
 export type VisualStyle = 'cinemagraph_plotagraph' | 'moody_lofi_ambient' | 'analog_horror_liminal';
 
 /** Modo de fuente de video */
-export type VideoSourceMode = 'comfyui' | 'pexels' | 'hybrid';
+export type VideoSourceMode = 'comfyui' | 'pexels' | 'hybrid' | 'hibridoTigre';
 
 /** Tipo de video */
 export type VideoType = 'short' | 'long';
@@ -373,12 +373,12 @@ export class ModelConfig {
             return 'hybrid';
         }
         
-        // Validar que sea uno de los tres valores permitidos (Requirements 8.10, 8.11)
-        const validModes: VideoSourceMode[] = ['comfyui', 'pexels', 'hybrid'];
+        // Validar que sea uno de los valores permitidos (comfyui, pexels, hybrid, hibridoTigre)
+        const validModes: VideoSourceMode[] = ['comfyui', 'pexels', 'hybrid', 'hibridoTigre'];
         if (!validModes.includes(mode as VideoSourceMode)) {
             throw new Error(
                 `[ModelConfig] Valor inválido para VIDEO_SOURCE_MODE: '${mode}'. ` +
-                `Valores permitidos: 'comfyui', 'pexels', 'hybrid'`
+                `Valores permitidos: 'comfyui', 'pexels', 'hybrid', 'hibridoTigre'`
             );
         }
         
