@@ -72,7 +72,9 @@ export class YouTubePublisher {
         const authClient = await GoogleAuth.getClient(tokenFilePath);
         const youtube = google.youtube({ version: 'v3', auth: authClient });
 
-        const videoPath = path.join(__dirname, '../../content', videoFileName);
+        const videoPath = path.isAbsolute(videoFileName) 
+            ? videoFileName 
+            : path.join(__dirname, '../../content', videoFileName);
         
         if (!fs.existsSync(videoPath)) {
             throw new Error(`Video file not found at ${videoPath}`);
