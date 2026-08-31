@@ -12,10 +12,10 @@ const logger = new Logger('SubtitleGenerator');
 
 export class SubtitleGenerator {
     /**
-     * Genera un archivo .ass con animaciones dinámicas aleatorias para palabras clave.
+     * Genera un archivo .ass con animaciones dinámicas adaptadas al formato (Shorts 9:16 vs Long 16:9).
      */
-    public static async generateASS(audioPath: string, text: string, assFilename: string): Promise<string> {
-        logger.info('Generando subtítulos ASS dinámicos', { audioPath });
+    public static async generateASS(audioPath: string, text: string, assFilename: string, isShort: boolean = true): Promise<string> {
+        logger.info('Generando subtítulos ASS dinámicos', { audioPath, isShort });
         
         return new Promise((resolve, reject) => {
             ffmpeg.ffprobe(audioPath, (err, metadata) => {
@@ -43,11 +43,11 @@ export class SubtitleGenerator {
                 // Seleccionamos "keywords" repartidas uniformemente
                 const keywords: string[] = [];
                 let currentChunk: string[] = [];
+                const wordsPerKeyword = isShort ? 5 : 4;
                 
                 for (const word of words) {
                     currentChunk.push(word);
-                    if (currentChunk.length >= 5) {
-                        // Limpiar puntuación para comparar
+                    if (currentChunk.length >= wordsPerKeyword) {
                         let bestWord = currentChunk.find(w => {
                             const cleanW = w.toLowerCase().replace(/[^\w\sáéíóúñ]/gi, '');
                             return cleanW.length > 3 && !stopWords.has(cleanW);
@@ -57,14 +57,12 @@ export class SubtitleGenerator {
                             bestWord = currentChunk.sort((a, b) => b.length - a.length)[0];
                         }
                         
-                        // Quitar todos los símbolos de la palabra seleccionada
                         const finalWord = bestWord.replace(/[^\w\sáéíóúñÁÉÍÓÚÑ]/gi, '');
                         keywords.push(finalWord.toUpperCase());
                         currentChunk = [];
                     }
                 }
                 
-                // Si sobra algo al final
                 if (currentChunk.length > 0) {
                     let bestWord = currentChunk.find(w => {
                         const cleanW = w.toLowerCase().replace(/[^\w\sáéíóúñ]/gi, '');
@@ -77,15 +75,21 @@ export class SubtitleGenerator {
 
                 if (keywords.length === 0) keywords.push("...");
 
+                const resX = isShort ? 1080 : 1920;
+                const resY = isShort ? 1920 : 1080;
+                const fontSize = isShort ? 110 : 54;
+                const alignment = isShort ? 5 : 2; // 5 = Center (Shorts), 2 = Bottom Center (Long)
+                const marginV = isShort ? 10 : 60;
+
                 // Archivo ASS cabecera
                 const assLines = [
                     '[Script Info]',
                     'ScriptType: v4.00+',
-                    'PlayResX: 1080',
-                    'PlayResY: 1920',
+                    `PlayResX: ${resX}`,
+                    `PlayResY: ${resY}`,
                     '[V4+ Styles]',
                     'Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding',
-                    'Style: Main,Arial,120,&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,5,0,5,10,10,10,1',
+                    `Style: Main,Arial,${fontSize},&H00FFFFFF,&H000000FF,&H00000000,&H00000000,-1,0,0,0,100,100,0,0,1,4,0,${alignment},20,20,${marginV},1`,
                     '[Events]',
                     'Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text'
                 ];
@@ -98,14 +102,6 @@ export class SubtitleGenerator {
                     currentTime += timePerKeyword;
                     const endTime = this.formatAssTime(currentTime);
 
-                    // Animaciones aleatorias ASS
-                    const fxOptions = [
-                        '\\move(540,1500,540,960)', // Star wars subir
-                        '\\t(\\fscx150\\fscy150)',  // Zoom in
-                        '\\fad(200,200)',           // Fade in/out
-                        '\\pos(540,960)\\frz' + Math.floor(Math.random() * 30 - 15) // Rotación aleatoria al centro
-                    ];
-                    const fx = fxOptions[Math.floor(Math.random() * fxOptions.length)];
                     // Colores vibrantes ASS (formato BBGGRR)
                     const colors = [
                         '00FFFF', // Amarillo
@@ -117,10 +113,22 @@ export class SubtitleGenerator {
                         '00A5FF'  // Naranja
                     ];
                     const randomColor = colors[Math.floor(Math.random() * colors.length)];
-                    
                     const word = keywords[i].trim();
+
+                    let fx = '';
+                    if (isShort) {
+                        const fxOptions = [
+                            '\\move(540,1500,540,960)',
+                            '\\t(\\fscx140\\fscy140)',
+                            '\\fad(150,150)',
+                            '\\pos(540,960)\\frz' + Math.floor(Math.random() * 20 - 10)
+                        ];
+                        fx = fxOptions[Math.floor(Math.random() * fxOptions.length)];
+                    } else {
+                        // En videos largos horizontales, mantener en parte inferior con sutileza cinematográfica
+                        fx = '\\fad(150,150)';
+                    }
                     
-                    // Ass dialogue line
                     if (word.length > 0) {
                         assLines.push(`Dialogue: 0,${startTime},${endTime},Main,,0,0,0,,{\\1c&H${randomColor}&${fx}}${word}`);
                     }

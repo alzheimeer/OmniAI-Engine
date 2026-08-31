@@ -609,9 +609,9 @@ export class VideoRenderer {
         
         const audioPath = path.join(__dirname, '../../content', audioFilename);
         
-        // Generar Subtítulos (ASS Dinámicos)
+        // Generar Subtítulos (ASS Dinámicos adaptados a 16:9)
         const assFilename = outputFilename.replace('.mp4', '.ass');
-        await SubtitleGenerator.generateASS(audioPath, text, assFilename);
+        await SubtitleGenerator.generateASS(audioPath, text, assFilename, false);
         const assPath = path.join(__dirname, '../../content', assFilename);
 
         const downloadedVideos: string[] = [];

@@ -414,7 +414,7 @@ The JSON must have this exact structure:
   "description": "A detailed SEO optimized description with key points mentioned",
   "tags": ["autism", "ai", "neurodiversity", "tech", "etc"],
   "hook": "The exact words for the first 10 seconds - must grab attention",
-  "spokenText": "The entire script text for the voiceover (1200-1500 words). MUST start with the hook. Keep it engaging, educational, and professional.",
+  "spokenText": "The entire script text for the voiceover (${words} words). MUST start with the hook. Keep it engaging, educational, and professional.",
   "visualPrompts": ["technology", "neon brain", "abstract data", "coding screen", "happy family", "office", "robot", "light bulb", "medical", "brain"],
   "comfyPrompts": [
     {"prompt": "futuristic holographic brain visualization floating in dark space, soft blue and purple neon lighting, particles drifting slowly, seamless loop motion, static camera with minimal motion", "style": "cinemagraph_plotagraph"},

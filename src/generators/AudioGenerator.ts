@@ -163,7 +163,8 @@ export class AudioGenerator {
             },
             audioConfig: { 
                 audioEncoding: 'MP3',
-                speakingRate: 1.1
+                speakingRate: 1.0,
+                pitch: 0.0
             }
         };
 
@@ -274,21 +275,12 @@ export class AudioGenerator {
     }
 
     /**
-     * Post-process audio with FFmpeg to remove silence and apply micro-mutations
+     * Post-process audio with FFmpeg applying Broadcast Studio Mastering (EBU R128 Loudnorm)
+     * Preserves natural pauses, clear diction and consistent studio-grade volume.
      */
     private static async applyAudioFilters(inputPath: string, outputPath: string, workDir: string): Promise<void> {
-        const applyMasking = Math.random() < 0.25; // 25% of the time, apply deep masking
-        let filterChain = "silenceremove=start_periods=1:start_duration=0.05:start_threshold=-50dB";
-        if (applyMasking) {
-            // NOTA: atempo=1.02 era detectable por YouTube. Esta técnica usa:
-            // - asetrate*1.02: Sube el formante 2%
-            // - aresample: Normaliza sample rate
-            // - atempo=0.9804: Compensa la velocidad (inverso de 1.02)
-            // Resultado: misma duración, timbre diferente, indetectable
-            filterChain += ",asetrate=44100*1.02,aresample=44100,atempo=0.9804";
-            // El resultado: misma velocidad, pero voz con timbre ligeramente diferente
-            logger.info('Aplicando humanización de voz (Formant Shift + compensación)');
-        }
+        const filterChain = "loudnorm=I=-16:TP=-1.5:LRA=11,acompressor=threshold=-20dB:ratio=2.5:attack=5:release=50";
+        logger.info('Aplicando masterización de estudio broadcast (Loudnorm + Compressor)');
         
         try {
             const ffmpegPath = ffmpegInstaller.path;
