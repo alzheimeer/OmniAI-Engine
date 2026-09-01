@@ -189,8 +189,11 @@ export const CHANNEL2_BRANDING: ChannelBrandingConfig = {
 export const CHANNEL3_BRANDING: ChannelBrandingConfig = {
     id: 'channel3',
     info: {
+        id: 'channel3',
         name: 'ColombianDreamm',
-        niche: 'Curiosidades Universales & Misterios'
+        niche: 'Curiosidades Universales & Misterios',
+        focus: ['misterios', 'curiosidades', 'psicología', 'universo'],
+        highlightKeywords: ['MISTERIO', 'CURIOSIDAD', 'SECRETO', 'PSICOLOGÍA', 'UNIVERSO', 'TEORÍA']
     },
     colors: {
         primary: '#4B0082',      // Indigo oscuro
