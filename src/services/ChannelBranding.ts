@@ -187,7 +187,6 @@ export const CHANNEL2_BRANDING: ChannelBrandingConfig = {
 // ===== CONFIGURACIÓN CANAL 3: ColombianDreamm =====
 
 export const CHANNEL3_BRANDING: ChannelBrandingConfig = {
-    id: 'channel3',
     info: {
         id: 'channel3',
         name: 'ColombianDreamm',
