@@ -20,6 +20,7 @@ export interface YouTubeVideoMetadata {
     privacyStatus?: 'public' | 'private' | 'unlisted';
     isShort?: boolean; // Flag to indicate if this is a YouTube Short
     visualPrompt?: string; // For thumbnail generation
+    channelKey?: string; // Para determinar el disclaimer
 }
 
 export class YouTubePublisher {
@@ -97,7 +98,14 @@ export class YouTubePublisher {
         
         // Build optimized description with hashtags
         const hashtagString = sanitizedTags.slice(0, 15).map(tag => `#${tag.replace(/\s+/g, '')}`).join(' ');
-        const disclaimer = "\n\n⚠️ Disclaimer: Este contenido fue sintetizado con asistencia de Inteligencia Artificial para fines educativos. No constituye asesoramiento médico, psicológico ni profesional sobre el autismo o la neurodiversidad.";
+        
+        let disclaimer = "";
+        if (metadata.channelKey === 'channel3') {
+            disclaimer = "\n\n⚠️ Disclaimer: This video was synthesized with the assistance of AI for educational and entertainment purposes. It explores mysteries, theories, and psychological facts. Always verify facts independently.";
+        } else {
+            disclaimer = "\n\n⚠️ Disclaimer: Este contenido fue sintetizado con asistencia de Inteligencia Artificial para fines educativos. No constituye asesoramiento médico, psicológico ni profesional sobre el autismo o la neurodiversidad.";
+        }
+        
         const optimizedDescription = `${metadata.description}${shortsTag}\n\n${hashtagString}${disclaimer}`;
 
         const finalPrivacyStatus = metadata.privacyStatus || 'public';

@@ -18,19 +18,60 @@ export interface ThumbnailConfig {
 export class ThumbnailGenerator {
     
     /**
+     * Simple hash function to consistently pick a style based on title
+     */
+    private static getStyleIndex(title: string, max: number): number {
+        let hash = 0;
+        for (let i = 0; i < title.length; i++) {
+            hash = title.charCodeAt(i) + ((hash << 5) - hash);
+        }
+        return Math.abs(hash) % max;
+    }
+
+    /**
      * Construye un prompt estructurado siguiendo las mejores prácticas de 
      * Prompt Engineering para Thumbnails 2026 (alto contraste, diferenciación, sin texto).
      */
-    public static buildAIPrompt(title: string, visualPrompt?: string, isShort: boolean = true): string {
-        const theme = visualPrompt || title || 'autism and artificial intelligence technology';
+    public static buildAIPrompt(title: string, visualPrompt?: string, isShort: boolean = true, channelKey?: string): string {
+        const theme = visualPrompt || title || 'artificial intelligence technology';
+        
+        let subjectStyle = '';
+        let lightingStyle = '';
+        
+        if (channelKey === 'channel3') {
+            const styles = [
+                { s: `${theme}, hyper-realistic, dramatic cinematic scene, NO cyborgs, NO robots, movie poster style`, l: `Ultra dramatic lighting, deep shadows, neon accents, high contrast` },
+                { s: `${theme}, vintage documentary style, gritty texture, retro mystery, NO cyborgs`, l: `Sepia tones with vibrant red accents, dramatic side lighting` },
+                { s: `${theme}, surreal ethereal dreamscape, impossible geometry, NO cyborgs`, l: `Glowing ethereal lighting, mysterious fog, soft diffuse light` },
+                { s: `${theme}, extreme close-up macro photography, high detail, NO cyborgs`, l: `Shallow depth of field, neon rim lighting, deep black shadows` },
+                { s: `${theme}, supernatural vibrant glow, otherworldly atmosphere, NO cyborgs`, l: `High contrast, vivid colors, magical luminescent glow` }
+            ];
+            const selected = styles[this.getStyleIndex(title, styles.length)];
+            subjectStyle = selected.s;
+            lightingStyle = selected.l;
+        } else if (channelKey === 'channel2' || channelKey === 'channel1') {
+            const styles = [
+                { s: `${theme}, clean minimalist 3d render, glossy finish`, l: `Soft white and light blue studio lighting` },
+                { s: `${theme}, cyberpunk sleek productivity tech, glowing neural AI interface`, l: `High-contrast dramatic cinematic lighting, glowing neon cyan and purple accents, deep black shadows` },
+                { s: `${theme}, abstract geometric shapes, glassmorphism, corporate tech`, l: `Bright optimistic lighting, clear reflections` },
+                { s: `${theme}, glowing holographic projection, futuristic interface, wireframe accents`, l: `Dark background, bright neon blue holograms` },
+                { s: `${theme}, 3d claymation cute UI style, trendy tech`, l: `Pastel colors, soft isometric lighting` }
+            ];
+            const selected = styles[this.getStyleIndex(title, styles.length)];
+            subjectStyle = selected.s;
+            lightingStyle = selected.l;
+        } else {
+            subjectStyle = `${theme}, clean clinical medical illustration style, modern science, bright and optimistic`;
+            lightingStyle = `Bright studio lighting, soft glowing white and light blue accents, clean light background`;
+        }
         
         if (isShort) {
             // Formato Vertical (Shorts 9:16)
             return [
                 `Vertical YouTube Short thumbnail background (1080x1920):`,
-                `- SUBJECT: ${theme}, futuristic glowing cyborg or brain with glowing cyan neural pathways`,
-                `- COMPOSITION: Vertical portrait, focal subject centered in middle-lower third, clean dark space at top for title`,
-                `- LIGHTING: Ultra dramatic volumetric lighting, vibrant cyan #00d4ff rim lights, deep black #060913 background`,
+                `- SUBJECT: ${subjectStyle}`,
+                `- COMPOSITION: Vertical portrait, focal subject centered in middle-lower third, clean space at top for title`,
+                `- LIGHTING: ${lightingStyle}`,
                 `- STYLE: 8k resolution, cinematic Octane render, highly detailed, photorealistic concept art`,
                 `- NEGATIVE: No text, no letters, no words, no arrows, no watermarks, no blurry artifacts`
             ].join('\n');
@@ -38,9 +79,9 @@ export class ThumbnailGenerator {
             // Formato Horizontal (Videos Largos 16:9)
             return [
                 `Horizontal YouTube video thumbnail background (1280x720, 16:9):`,
-                `- SUBJECT: ${theme}, stunning futuristic glowing neural AI interface or cybernetic technology`,
-                `- COMPOSITION: Rule of thirds, strong focal point on the RIGHT side, deep dark empty negative space on the LEFT 50% for text`,
-                `- LIGHTING: High-contrast dramatic cinematic lighting, glowing neon cyan #00d4ff accents, deep black #050811 shadows`,
+                `- SUBJECT: ${subjectStyle}`,
+                `- COMPOSITION: Rule of thirds, strong focal point on the RIGHT side, empty negative space on the LEFT 50% for text`,
+                `- LIGHTING: ${lightingStyle}`,
                 `- STYLE: 8k Unreal Engine 5 render, cinematic movie poster style, sharp focus`,
                 `- NEGATIVE: No text, no letters, no words, no signs, no logos, no watermark, no blurred low-res`
             ].join('\n');
@@ -55,9 +96,10 @@ export class ThumbnailGenerator {
         visualPrompt: string | undefined, 
         isShort: boolean, 
         width: number, 
-        height: number
+        height: number,
+        channelKey?: string
     ): Promise<string> {
-        const prompt = this.buildAIPrompt(title, visualPrompt, isShort);
+        const prompt = this.buildAIPrompt(title, visualPrompt, isShort, channelKey);
 
         // 1. Google Gemini / Imagen 3
         const googleKey = process.env.GOOGLE_API_KEY || process.env.GEMINI_API_KEY;
@@ -144,9 +186,12 @@ export class ThumbnailGenerator {
         
         const width = config.isShort ? 1080 : 1280;
         const height = config.isShort ? 1920 : 720;
-        const brandName = config.channelKey === 'channel2' || config.channelName?.includes('NeuroTech') 
-            ? 'NeuroTech AI' 
-            : 'NeuroSync AI';
+        let brandName = 'NeuroSync AI';
+        if (config.channelKey === 'channel3') {
+            brandName = 'ColombianDreamm';
+        } else if (config.channelKey === 'channel2' || config.channelName?.includes('NeuroTech')) {
+            brandName = 'NeuroTech AI';
+        }
 
         // 1. Obtener imagen de fondo con IA
         const backgroundDataUrl = await this.fetchBackgroundImage(
@@ -154,7 +199,8 @@ export class ThumbnailGenerator {
             config.visualPrompt, 
             config.isShort, 
             width, 
-            height
+            height,
+            config.channelKey
         );
 
         // 2. Renderizado HTML/CSS especializado por formato con Puppeteer

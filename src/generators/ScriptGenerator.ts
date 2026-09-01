@@ -372,10 +372,12 @@ The JSON must have this exact structure:
      * @param language The language of the script (e.g., "Spanish" or "English")
      */
     public static async generateLongScript(seo: SEOStrategy, language: string = 'Spanish', channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1'): Promise<VideoScript> {
-        const channelName = channelKey === 'channel1' ? 'NeuroSync AI' : 'NeuroTech AI';
+        const channelName = channelKey === 'channel3' ? 'ColombianDreamm' : (channelKey === 'channel2' ? 'NeuroTech AI' : 'NeuroSync AI');
         logger.info(`Generando Long-Form YouTube script para ${channelName}`, { language, topic: seo.rawTopic });
 
-        const channelContext = channelKey === 'channel2'
+        const channelContext = channelKey === 'channel3'
+            ? `The channel "ColombianDreamm" focuses on Universal Curiosities, Unexplained Mysteries, and Psychological Facts. Broad appeal, highly engaging viral hooks, mind-bending facts.`
+            : channelKey === 'channel2'
             ? `The channel "NeuroTech AI" focuses on AI productivity hacks, workplace automation, and digital business for ADHD & Neurodivergent individuals.`
             : `The channel "NeuroSync AI" focuses on Autism & Artificial Intelligence: empowering autistic minds, cognitive tools, sensory support, and social skills through AI.`;
 
@@ -394,12 +396,12 @@ Write a highly engaging, deep-dive ${duration}-minute script about: ${seo.rawTop
 The video's final title will be "${seo.viralTitle}".
 IMPORTANT: The entire output (title, description, tags, spokenText) MUST be in ${language.toUpperCase()}.
 
-CRITICAL FOR SCRIPT LENGTH: The script MUST be ${words} words (approx ${duration} minutes) to maximize audience retention and avoid unverified account limits.
+CRITICAL FOR SCRIPT LENGTH: The script MUST be ${words} words (approx ${duration} minutes). DO NOT write a short summary! You MUST generate a full, extensive script. Expand on each point with deep details, storytelling, and examples. If your spokenText is under 600 words, you fail.
 
-The script should follow this structure:
+The script should follow this structure (aim for at least 8-10 long paragraphs total):
 1. HOOK (first 10 seconds) - Provocative statement to grab attention
 2. INTRO - Brief overview of what the video covers
-3. MAIN CONTENT - 5-6 key points, each with examples
+3. MAIN CONTENT - 5-6 key points, each explored in deep detail with examples (This should make up 80% of the word count)
 4. CONCLUSION - Summary and call to action
 
 You must provide:

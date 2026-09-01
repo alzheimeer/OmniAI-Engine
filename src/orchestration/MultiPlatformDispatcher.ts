@@ -975,12 +975,18 @@ export class MultiPlatformDispatcher {
             // Extraer solo el nombre del archivo para YouTubePublisher
             const videoFileName = adaptedContent.videoPath.split(/[\/\\]/).pop() || adaptedContent.videoPath;
             
+            // Inferir el canal desde el tokenFilePath si no está explícito en otro lado
+            let inferredChannelKey = 'channel1';
+            if (content.tokenFilePath?.includes('channel3')) inferredChannelKey = 'channel3';
+            else if (content.tokenFilePath?.includes('channel2')) inferredChannelKey = 'channel2';
+            
             const videoUrl = await YouTubePublisher.publishVideo(videoFileName, {
                 title: content.title,
                 description: content.description,
                 tags: content.tags,
                 isShort: adaptedContent.duration <= 60,
-                visualPrompt: content.thumbnailPath // Aprovechamos para pasar el prompt o thumbnail
+                visualPrompt: content.thumbnailPath, // Aprovechamos para pasar el prompt o thumbnail
+                channelKey: inferredChannelKey
             }, content.tokenFilePath);
             
             return {

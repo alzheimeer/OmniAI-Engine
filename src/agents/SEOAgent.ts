@@ -190,7 +190,10 @@ export class SEOAgent {
             }
         }
         
-        const channelName = channelKey === 'channel1' ? 'NeuroSync AI' : 'NeuroTech AI';
+        let channelName = 'NeuroSync AI';
+        if (channelKey === 'channel2') channelName = 'NeuroTech AI';
+        else if (channelKey === 'channel3') channelName = 'ColombianDreamm';
+
         console.log(`🤖 SEOAgent: Investigando tendencias para ${channelName} en ${language}...${retryCount > 0 ? ` (intento ${retryCount + 1}/${MAX_RETRIES + 1})` : ''}`);
         
         // Obtener temas ya usados en ESTE CANAL ESPECÍFICO para evitar duplicados
@@ -211,18 +214,26 @@ export class SEOAgent {
         // RAG Empírico
         const newsGroundingText = await this.fetchDailyNews(channelKey);
         
-        const isChannel2 = channelKey === 'channel2';
-        const channelNiche = isChannel2 
-            ? `PRODUCTIVIDAD, TRABAJO, TECNOLOGÍA Y HACKS DE VIDA PARA NEURODIVERGENTES (TDAH / AUTISMO).
+        let channelNiche = '';
+        if (channelKey === 'channel3') {
+            channelNiche = `PSYCHOLOGICAL FACTS, UNIVERSAL MYSTERIES, MIND-BLOWING CURIOSITIES (ColombianDreamm).
+Topics MUST rotate between these 3 pillars:
+1. PILLAR 1 - Psychological Facts & Human Mind: (Subconscious secrets, why people do what they do, hidden psychological tricks, dreams).
+2. PILLAR 2 - Universal & Historical Mysteries: (Unsolved historical events, space mysteries, hidden ancient technologies, ocean depths).
+3. PILLAR 3 - Mind-Blowing Curiosities: (Things you didn't know about everyday objects, glitches in the matrix, unbelievable true stories).`;
+        } else if (channelKey === 'channel2') {
+            channelNiche = `PRODUCTIVIDAD, TRABAJO, TECNOLOGÍA Y HACKS DE VIDA PARA NEURODIVERGENTES (TDAH / AUTISMO).
 Topics MUST rotate between these 3 pillars:
 1. PILLAR 1 - AI & Executive Function Hacks: (ChatGPT, Goblin.tools, Saner.AI, Tiimo, Notion AI, task breakdown, time blindness, friction-free organization).
 2. PILLAR 2 - Workplace & Career Strategy: (Remote work hacks, requesting accommodations without stigma, managing ADHD/Autistic burnout at work, hyperfocus management).
-3. PILLAR 3 - Sensory Environment & Hardware Setup: (Desk setups for sensory overload, noise-canceling tech, focus gadgets, reducing cognitive load).`
-            : `ENCICLOPEDIA HUMANA, CIENTÍFICA Y ESTILO DE VIDA DEL AUTISMO Y NEURODIVERSIDAD (NeuroSync AI).
+3. PILLAR 3 - Sensory Environment & Hardware Setup: (Desk setups for sensory overload, noise-canceling tech, focus gadgets, reducing cognitive load).`;
+        } else {
+            channelNiche = `ENCICLOPEDIA HUMANA, CIENTÍFICA Y ESTILO DE VIDA DEL AUTISMO Y NEURODIVERSIDAD (NeuroSync AI).
 Topics MUST rotate between these 3 pillars:
 1. PILLAR 1 - Science & Medicine: (Intestinal-brain axis, neuroscience, sensory processing, sleep, genetics, medical updates).
 2. PILLAR 2 - Psychology & Hidden Traits (High Search Volume): (Adult diagnosis, Autistic Masking, high-functioning autism, burnout vs depression, stimming myths).
 3. PILLAR 3 - AI & Assistive Technology: (AI communication tools, AAC apps, AI for social situations, technology for sensory overload).`;
+        }
 
         const personas = [
             "Experto Académico (Tono serio y basado en datos)",

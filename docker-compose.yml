@@ -12,6 +12,7 @@ services:
       - ./oauth2.tokens.json:/usr/src/app/oauth2.tokens.json
       - ./oauth2.tokens.channel2.json:/usr/src/app/oauth2.tokens.channel2.json
       - ./content:/usr/src/app/content
+      - ./src:/usr/src/app/src
     environment:
       - NODE_ENV=production
       - TZ=America/Bogota

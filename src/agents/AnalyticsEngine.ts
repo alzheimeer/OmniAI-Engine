@@ -23,8 +23,17 @@ export class AnalyticsEngine {
      * Sincroniza las métricas de un canal específico de YouTube con la BD
      */
     public static async syncMetrics(channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1'): Promise<ChannelAnalyticsSummary> {
-        const tokenPath = channelKey === 'channel1' ? 'oauth2.tokens.json' : 'oauth2.tokens.channel2.json';
-        const channelName = channelKey === 'channel1' ? 'NeuroSync AI' : 'NeuroTech AI';
+        let tokenPath = 'oauth2.tokens.json';
+        let channelName = 'NeuroSync AI';
+        
+        if (channelKey === 'channel2') {
+            tokenPath = 'oauth2.tokens.channel2.json';
+            channelName = 'NeuroTech AI';
+        } else if (channelKey === 'channel3') {
+            tokenPath = 'oauth2.tokens.channel3.json';
+            channelName = 'ColombianDreamm';
+        }
+        
         console.log(`📊 AnalyticsEngine: Sincronizando analíticas de ${channelName}...`);
         
         try {
