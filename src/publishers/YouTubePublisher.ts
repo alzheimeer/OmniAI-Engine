@@ -160,7 +160,9 @@ export class YouTubePublisher {
                         title: optimizedTitle,
                         isShort: metadata.isShort || false,
                         visualPrompt: metadata.visualPrompt,
-                        outputFilename: thumbnailFilename
+                        outputFilename: thumbnailFilename,
+                        channelKey: metadata.channelKey as any,
+                        badges: metadata.tags ? metadata.tags.slice(0, 2) : []
                     });
 
                     // Upload thumbnail to YouTube with retry

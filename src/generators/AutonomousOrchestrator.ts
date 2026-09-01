@@ -184,7 +184,16 @@ export class AutonomousOrchestrator {
 
             await AudioGenerator.generateAudio(script.spokenText, audioFile, language);
             
-            await VideoRenderer.renderVideo(script.visualPrompts, audioFile, videoFile, script.spokenText);
+            await VideoRenderer.renderVideo(
+                script.visualPrompts, 
+                audioFile, 
+                videoFile, 
+                script.spokenText,
+                undefined, // comfyPrompts
+                undefined, // videoId
+                channelKey,
+                script.tags ? script.tags.slice(0, 2) : []
+            );
 
             const videoDuration = await this.getVideoDuration(path.join(__dirname, '../../content', videoFile));
 

@@ -13,6 +13,7 @@ export interface ThumbnailConfig {
     outputFilename: string;
     channelKey?: 'channel1' | 'channel2' | 'channel3';
     channelName?: string;
+    badges?: string[];
 }
 
 export class ThumbnailGenerator {
@@ -211,7 +212,8 @@ export class ThumbnailGenerator {
             config.title,
             backgroundDataUrl,
             brandName,
-            config.isShort
+            config.isShort,
+            config.badges
         );
         
         console.log(`✅ ThumbnailGenerator: Miniatura guardada en ${outputPath}`);
@@ -228,7 +230,8 @@ export class ThumbnailGenerator {
         title: string,
         backgroundImageUrl: string,
         brandName: string,
-        isShort: boolean
+        isShort: boolean,
+        badges?: string[]
     ): Promise<void> {
         
         const escapedTitle = this.escapeHtml(title);
@@ -243,6 +246,8 @@ export class ThumbnailGenerator {
             const backgroundStyle = backgroundImageUrl
                 ? `background-image: linear-gradient(180deg, rgba(6,10,22,0.85) 0%, rgba(6,10,22,0.1) 40%, rgba(6,10,22,0.85) 100%), url('${backgroundImageUrl}'); background-size: cover; background-position: center;`
                 : `background: linear-gradient(135deg, #0a0e1a 0%, #061126 50%, #031b33 100%);`;
+            const badge1 = (badges && badges.length > 0) ? badges[0].toUpperCase() : 'NUEVA IA';
+            const htmlBadges = `<div class="badge">${this.escapeHtml(badge1)}</div>`;
 
             html = `
             <!DOCTYPE html>
@@ -258,45 +263,51 @@ export class ThumbnailGenerator {
                         display: flex;
                         flex-direction: column;
                         align-items: center;
-                        padding-top: 200px;
+                        justify-content: flex-end;
+                        padding-bottom: 250px;
                         overflow: hidden;
-                        font-family: 'Montserrat', sans-serif;
+                        font-family: 'Montserrat', 'Arial Black', sans-serif;
                     }
                     .title-card {
-                        background: rgba(6, 11, 24, 0.82);
-                        backdrop-filter: blur(20px);
-                        -webkit-backdrop-filter: blur(20px);
-                        border: 3px solid #00d4ff;
-                        border-radius: 26px;
-                        padding: 38px 32px;
-                        max-width: 90%;
+                        width: 90%;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
                         text-align: center;
-                        box-shadow: 0 25px 60px rgba(0,0,0,0.95), 0 0 40px rgba(0,212,255,0.4);
+                        z-index: 10;
                     }
                     .badge {
-                        display: inline-block;
                         background: #00d4ff;
                         color: #030712;
                         font-size: 24px;
                         font-weight: 900;
-                        padding: 8px 22px;
-                        border-radius: 10px;
-                        margin-bottom: 18px;
+                        padding: 8px 24px;
+                        border-radius: 12px;
+                        margin-bottom: 24px;
                         letter-spacing: 2px;
                         text-transform: uppercase;
+                        box-shadow: 0 0 25px rgba(0,212,255,0.6);
                     }
                     .title {
-                        font-size: 70px;
+                        font-size: 65px;
                         font-weight: 900;
                         color: #ffffff;
                         text-transform: uppercase;
-                        line-height: 1.15;
+                        line-height: 1.1;
                         letter-spacing: 1px;
-                        text-shadow: 0 4px 16px rgba(0,0,0,0.95);
+                        text-shadow: 
+                            3px 3px 0 #000,
+                            -3px -3px 0 #000,
+                            3px -3px 0 #000,
+                            -3px 3px 0 #000,
+                            0 10px 30px rgba(0,0,0,0.95);
                     }
                     .highlight {
                         color: #00d4ff;
-                        text-shadow: 0 0 35px rgba(0, 212, 255, 0.9);
+                        text-shadow: 
+                            3px 3px 0 #000,
+                            -3px -3px 0 #000,
+                            0 0 35px rgba(0, 212, 255, 0.95);
                     }
                     .brand {
                         position: absolute;
@@ -311,7 +322,7 @@ export class ThumbnailGenerator {
             </head>
             <body>
                 <div class="title-card">
-                    <div class="badge">NUEVA IA</div>
+                    ${htmlBadges}
                     <div class="title">${highlightedTitle}</div>
                 </div>
                 <div class="brand">${brandName.toUpperCase()}</div>
@@ -326,6 +337,13 @@ export class ThumbnailGenerator {
             const backgroundStyle = backgroundImageUrl
                 ? `background-image: linear-gradient(90deg, rgba(4,7,16,0.95) 0%, rgba(4,7,16,0.85) 45%, rgba(4,7,16,0.2) 80%, rgba(4,7,16,0.05) 100%), url('${backgroundImageUrl}'); background-size: cover; background-position: right center;`
                 : `background: linear-gradient(135deg, #0a0e1a 0%, #061126 50%, #031b33 100%);`;
+
+            const badge1 = (badges && badges.length > 0) ? badges[0].toUpperCase() : 'NUEVA IA';
+            const badge2 = (badges && badges.length > 1) ? badges[1].toUpperCase() : 'GUÍA DEFINITIVA';
+            const htmlBadges = `
+                <div class="badge">${this.escapeHtml(badge1)}</div>
+                ${badges && badges.length > 1 ? `<div class="badge-secondary">${this.escapeHtml(badge2)}</div>` : ''}
+            `;
 
             html = `
             <!DOCTYPE html>
@@ -416,8 +434,7 @@ export class ThumbnailGenerator {
             <body>
                 <div class="text-column">
                     <div class="badge-row">
-                        <div class="badge">NUEVA IA</div>
-                        <div class="badge-secondary">GUÍA DEFINITIVA</div>
+                        ${htmlBadges}
                     </div>
                     <div class="title">${highlightedTitle}</div>
                 </div>

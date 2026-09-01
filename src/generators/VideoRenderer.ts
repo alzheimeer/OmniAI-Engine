@@ -284,7 +284,9 @@ export class VideoRenderer {
         outputFilename: string, 
         text: string,
         comfyPrompts?: ComfyPrompt[],
-        videoId?: string
+        videoId?: string,
+        channelKey?: string,
+        badges?: string[]
     ): Promise<string> {
         // Generar videoId si no se proporciona (para tracking)
         const trackingVideoId = videoId || `short_${Date.now()}_${Math.random().toString(36).substring(7)}`;
@@ -473,7 +475,9 @@ export class VideoRenderer {
                 title: text.length > 60 ? text.substring(0, 60) + '...' : text,
                 isShort: true,
                 visualPrompt: visualPrompts?.[0],
-                outputFilename: thumbnailFilename
+                outputFilename: thumbnailFilename,
+                channelKey: channelKey as any,
+                badges: badges
             });
 
             logger.info('Generando escena de portada (1.5s) para el Short', { coverImgPath });
