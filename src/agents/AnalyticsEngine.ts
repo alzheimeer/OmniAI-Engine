@@ -22,7 +22,7 @@ export class AnalyticsEngine {
     /**
      * Sincroniza las métricas de un canal específico de YouTube con la BD
      */
-    public static async syncMetrics(channelKey: 'channel1' | 'channel2' = 'channel1'): Promise<ChannelAnalyticsSummary> {
+    public static async syncMetrics(channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1'): Promise<ChannelAnalyticsSummary> {
         const tokenPath = channelKey === 'channel1' ? 'oauth2.tokens.json' : 'oauth2.tokens.channel2.json';
         const channelName = channelKey === 'channel1' ? 'NeuroSync AI' : 'NeuroTech AI';
         console.log(`📊 AnalyticsEngine: Sincronizando analíticas de ${channelName}...`);

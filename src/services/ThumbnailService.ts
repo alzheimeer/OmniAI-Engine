@@ -457,7 +457,7 @@ export class ThumbnailService {
      * REQ-5.1.4: Generar thumbnail específico por canal
      * 
      * @param config - Configuración de generación
-     * @param channelId - ID del canal ('channel1' | 'channel2')
+     * @param channelId - ID del canal ('channel1' | 'channel2' | 'channel3')
      * @returns Resultado de la generación con branding del canal aplicado
      */
     public static async generateChannelThumbnail(

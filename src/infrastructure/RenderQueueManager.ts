@@ -35,7 +35,7 @@ export type VideoType = 'short' | 'long';
 /**
  * Canal de destino del video.
  */
-export type ChannelKey = 'channel1' | 'channel2';
+export type ChannelKey = 'channel1' | 'channel2' | 'channel3';
 
 /**
  * Estados posibles de un trabajo de renderizado.

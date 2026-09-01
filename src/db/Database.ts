@@ -18,7 +18,7 @@ export interface PublishedVideoRecord {
     topicHash?: string;
     keywords?: string;
     videoType?: 'short' | 'long';
-    channelKey?: 'channel1' | 'channel2';
+    channelKey?: 'channel1' | 'channel2' | 'channel3';
 }
 
 export interface PublishedBlogRecord {
@@ -175,7 +175,7 @@ export class Database {
         rawTopic?: string,
         keywords?: string[],
         videoType: 'short' | 'long' = 'short',
-        channelKey: 'channel1' | 'channel2' = 'channel1'
+        channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1'
     ): Promise<void> {
         return new Promise((resolve, reject) => {
             const db = this.getDB();
@@ -202,7 +202,7 @@ export class Database {
      * Verifica si un tema ya fue usado en un CANAL ESPECÍFICO (para evitar duplicados)
      * Retorna el video existente si hay duplicado en ese canal, null si es tema nuevo
      */
-    public static async checkTopicDuplicate(rawTopic: string, channelKey: 'channel1' | 'channel2' = 'channel1'): Promise<PublishedVideoRecord | null> {
+    public static async checkTopicDuplicate(rawTopic: string, channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1'): Promise<PublishedVideoRecord | null> {
         return new Promise((resolve, reject) => {
             const db = this.getDB();
             const topicHash = generateTopicHash(rawTopic);
@@ -221,7 +221,7 @@ export class Database {
     /**
      * Obtiene los últimos N temas usados EN UN CANAL ESPECÍFICO para contexto del LLM
      */
-    public static async getRecentTopics(limit: number = 50, channelKey: 'channel1' | 'channel2' = 'channel1'): Promise<string[]> {
+    public static async getRecentTopics(limit: number = 50, channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1'): Promise<string[]> {
         return new Promise((resolve, reject) => {
             const db = this.getDB();
             db.all(
@@ -364,7 +364,7 @@ export class Database {
      * Obtiene videos de UN CANAL ESPECÍFICO (para sincronización de métricas)
      * IMPORTANTE: Usar este método en AnalyticsEngine para evitar mezclar videos de canales
      */
-    public static getVideosByChannel(channelKey: 'channel1' | 'channel2'): Promise<PublishedVideoRecord[]> {
+    public static getVideosByChannel(channelKey: 'channel1' | 'channel2' | 'channel3'): Promise<PublishedVideoRecord[]> {
         return new Promise((resolve, reject) => {
             const db = this.getDB();
             db.all(

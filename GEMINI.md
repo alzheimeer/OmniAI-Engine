@@ -253,3 +253,8 @@ Implementación exhaustiva según spec `omniai-v2-optimization`, enfocada en eva
    - **Prompts Duales:** `ScriptGenerator` genera `visualPrompts` (Pexels) + `comfyPrompts` (20-50 palabras para ComfyUI).
    - **Pollinations.ai Fallback:** API gratuita sin límites para generación de imágenes cuando ComfyUI no está disponible o para I2V.
    - **Script init-clip-pool.ts:** Inicializador del pool que genera clips en background hasta completar el mínimo por categoría.
+
+## [2026-09-01] Operación Viralidad y Des-Shadowban
+- **Tercer Canal (ColombianDreamm)**: Inyección profunda de `channel3` en todo el sistema. Nicho configurado: Curiosidades Universales, Misterios y Datos Psicológicos.
+- **Protocolo Des-Shadowban**: Reducción de frecuencia de publicación de `channel1` y `channel2` a 1 Short cada 48 horas (Inglés) y 1 Video Largo semanal para reiniciar la salud algorítmica.
+- **Canal Viral (`channel3`)**: Configurado a 1 Short diario (Inglés) y 1 Video Largo dominical.

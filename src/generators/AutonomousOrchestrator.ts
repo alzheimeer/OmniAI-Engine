@@ -52,26 +52,20 @@ export class AutonomousOrchestrator {
         }, cronOpts);
 
         // --- CANAL 1: NeuroSync AI (Autismo e Inteligencia Artificial) ---
-        // Shorts (Lunes, Miércoles, Viernes - 09:00 AM, 01:00 PM, 08:30 PM)
-        cron.schedule('0 9 * * 1,3,5', async () => contentQueue.add('runShortPipeline', { language: 'Spanish', channelKey: 'channel1' }), cronOpts);
+        // Shadowban Protocol: 1 Short cada 48h y 1 Largo Semanal
         cron.schedule('0 13 * * 1,3,5', async () => contentQueue.add('runShortPipeline', { language: 'English', channelKey: 'channel1' }), cronOpts);
-        cron.schedule('30 20 * * 1,3,5', async () => contentQueue.add('runShortPipeline', { language: 'Portuguese', channelKey: 'channel1' }), cronOpts);
-
-        // Videos Largos (Martes, Jueves, Sábados - 03:00 PM) - 100% libre de colisión con Shorts
-        cron.schedule('0 15 * * 2', async () => contentQueue.add('runLongPipeline', { language: 'Spanish', channelKey: 'channel1' }), cronOpts);
-        cron.schedule('0 15 * * 4', async () => contentQueue.add('runLongPipeline', { language: 'English', channelKey: 'channel1' }), cronOpts);
-        cron.schedule('0 15 * * 6', async () => contentQueue.add('runLongPipeline', { language: 'Portuguese', channelKey: 'channel1' }), cronOpts);
+        cron.schedule('0 15 * * 2', async () => contentQueue.add('runLongPipeline', { language: 'English', channelKey: 'channel1' }), cronOpts);
 
         // --- CANAL 2: NeuroTech AI (Productividad, Trabajo & Negocios con IA para Neurodivergentes) ---
-        // Shorts (Martes, Jueves, Sábados - 09:30 AM, 01:30 PM, 08:00 PM)
-        cron.schedule('30 9 * * 2,4,6', async () => contentQueue.add('runShortPipeline', { language: 'Spanish', channelKey: 'channel2' }), cronOpts);
+        // Shadowban Protocol: 1 Short cada 48h y 1 Largo Semanal
         cron.schedule('30 13 * * 2,4,6', async () => contentQueue.add('runShortPipeline', { language: 'English', channelKey: 'channel2' }), cronOpts);
-        cron.schedule('0 20 * * 2,4,6', async () => contentQueue.add('runShortPipeline', { language: 'Portuguese', channelKey: 'channel2' }), cronOpts);
+        cron.schedule('30 15 * * 1', async () => contentQueue.add('runLongPipeline', { language: 'English', channelKey: 'channel2' }), cronOpts);
 
-        // Videos Largos (Lunes, Miércoles, Viernes - 03:30 PM) - Con ventana holgada de 2.5 horas antes del siguiente Short
-        cron.schedule('30 15 * * 1', async () => contentQueue.add('runLongPipeline', { language: 'Spanish', channelKey: 'channel2' }), cronOpts);
-        cron.schedule('30 15 * * 3', async () => contentQueue.add('runLongPipeline', { language: 'English', channelKey: 'channel2' }), cronOpts);
-        cron.schedule('30 15 * * 5', async () => contentQueue.add('runLongPipeline', { language: 'Portuguese', channelKey: 'channel2' }), cronOpts);
+        // --- CANAL 3: ColombianDreamm (Curiosidades Universales - VIRALIDAD PURA) ---
+        // Viral Protocol: 1 Short Diario, 1 Largo Semanal (Domingos)
+        // Optamos por Inglés para maximizar RPM, pero se podría ajustar a Español si se requiere.
+        cron.schedule('0 18 * * *', async () => contentQueue.add('runShortPipeline', { language: 'English', channelKey: 'channel3' }), cronOpts);
+        cron.schedule('0 12 * * 0', async () => contentQueue.add('runLongPipeline', { language: 'English', channelKey: 'channel3' }), cronOpts);
 
         // 3. DIARIAMENTE - ARTÍCULOS DE BLOG MULTI-PLATAFORMA (6:00 AM, 7 DÍAS A LA SEMANA)
         cron.schedule('0 6 * * *', async () => contentQueue.add('runBlogPipeline', {}), cronOpts);
@@ -158,10 +152,10 @@ export class AutonomousOrchestrator {
     /**
      * Ejecuta el pipeline completo de un Short
      */
-    public static async runShortPipeline(language: string, channelKey: 'channel1' | 'channel2' = 'channel1') {
-        const channelName = channelKey === 'channel1' ? 'NeuroSync AI' : 'NeuroTech AI';
-        const tokenPath = channelKey === 'channel1' ? 'oauth2.tokens.json' : 'oauth2.tokens.channel2.json';
-        const hashtagBlock = channelKey === 'channel1' ? '#Autism #AI #Neurodiversity' : '#NeuroTech #AI #Productivity #ADHD';
+    public static async runShortPipeline(language: string, channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1') {
+        const channelName = channelKey === 'channel3' ? 'ColombianDreamm' : (channelKey === 'channel2' ? 'NeuroTech AI' : 'NeuroSync AI');
+        const tokenPath = channelKey === 'channel3' ? 'oauth2.tokens.channel3.json' : (channelKey === 'channel2' ? 'oauth2.tokens.channel2.json' : 'oauth2.tokens.json');
+        const hashtagBlock = channelKey === 'channel3' ? '#Curiosities #Mystery #MindBlown' : (channelKey === 'channel2' ? '#NeuroTech #AI #Productivity #ADHD' : '#Autism #AI #Neurodiversity');
 
         try {
             await TelegramReporter.sendMessage(`⚙️ Iniciando Short en <b>${language}</b> para <b>${channelName}</b>...`);
@@ -293,10 +287,10 @@ export class AutonomousOrchestrator {
     /**
      * Ejecuta el pipeline completo de un Documental / Video Largo
      */
-    public static async runLongPipeline(language: string, channelKey: 'channel1' | 'channel2' = 'channel1') {
-        const channelName = channelKey === 'channel1' ? 'NeuroSync AI' : 'NeuroTech AI';
-        const tokenPath = channelKey === 'channel1' ? 'oauth2.tokens.json' : 'oauth2.tokens.channel2.json';
-        const hashtagBlock = channelKey === 'channel1' ? '#Autism #AI #Neurodiversity' : '#NeuroTech #AI #Productivity #ADHD';
+    public static async runLongPipeline(language: string, channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1') {
+        const channelName = channelKey === 'channel3' ? 'ColombianDreamm' : (channelKey === 'channel2' ? 'NeuroTech AI' : 'NeuroSync AI');
+        const tokenPath = channelKey === 'channel3' ? 'oauth2.tokens.channel3.json' : (channelKey === 'channel2' ? 'oauth2.tokens.channel2.json' : 'oauth2.tokens.json');
+        const hashtagBlock = channelKey === 'channel3' ? '#Curiosities #Mystery #MindBlown' : (channelKey === 'channel2' ? '#NeuroTech #AI #Productivity #ADHD' : '#Autism #AI #Neurodiversity');
 
         try {
             await TelegramReporter.sendMessage(`🎬 Iniciando Documental en <b>${language}</b> para <b>${channelName}</b>...`);

@@ -11,7 +11,7 @@ export interface ThumbnailConfig {
     isShort: boolean;
     visualPrompt?: string;
     outputFilename: string;
-    channelKey?: 'channel1' | 'channel2';
+    channelKey?: 'channel1' | 'channel2' | 'channel3';
     channelName?: string;
 }
 

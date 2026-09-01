@@ -190,7 +190,7 @@ export class YouTubePublisher {
                 });
                 
                 // Determinar el canal basado en el tokenFilePath
-                const channelKey: 'channel1' | 'channel2' = tokenFilePath?.includes('channel2') ? 'channel2' : 'channel1';
+                const channelKey: 'channel1' | 'channel2' | 'channel3' = tokenFilePath?.includes('channel2') ? 'channel2' : 'channel1';
                 
                 const fallbackResult = await FallbackStrategies.youtubeFallback(
                     videoFileName,

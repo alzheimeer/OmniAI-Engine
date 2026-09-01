@@ -224,7 +224,7 @@ router.get('/status', async (req: Request, res: Response) => {
  * Query params:
  * - status: 'dead-letter' | 'reprocessing' | 'resolved'
  * - type: 'short' | 'long'
- * - channelKey: 'channel1' | 'channel2'
+ * - channelKey: 'channel1' | 'channel2' | 'channel3'
  * - limit: número (default 100)
  * - offset: número (default 0)
  * - orderBy: 'asc' | 'desc' (default 'desc')
@@ -542,7 +542,7 @@ interface PersistedQueryParams {
  * Query params:
  * - status: 'pending' | 'processing' | 'completed' | 'failed'
  * - type: 'short' | 'long'
- * - channelKey: 'channel1' | 'channel2'
+ * - channelKey: 'channel1' | 'channel2' | 'channel3'
  * - limit: número (default 100, max 1000)
  * - offset: número (default 0)
  * - orderBy: 'asc' | 'desc' (default 'desc')

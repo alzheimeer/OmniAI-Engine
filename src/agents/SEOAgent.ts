@@ -86,7 +86,7 @@ export interface MultiPlatformSEOStrategy {
     /** Mood detectado del contenido para selección de música */
     detectedMood: 'ambient' | 'upbeat' | 'cinematic' | 'calm' | 'dramatic';
     /** Canal objetivo */
-    channelKey: 'channel1' | 'channel2';
+    channelKey: 'channel1' | 'channel2' | 'channel3';
 }
 
 /**
@@ -118,7 +118,7 @@ export class SEOAgent {
     /**
      * Fetch recent news via RSS to ground the LLM
      */
-    private static async fetchDailyNews(channelKey: 'channel1' | 'channel2'): Promise<string> {
+    private static async fetchDailyNews(channelKey: 'channel1' | 'channel2' | 'channel3'): Promise<string> {
         try {
             const feedUrl = channelKey === 'channel1' 
                 ? 'https://www.spectrumnews.org/feed/' 
@@ -155,7 +155,7 @@ export class SEOAgent {
         language: string = 'Spanish', 
         performanceContext?: string,
         contentType: 'video' | 'blog' = 'video',
-        channelKey: 'channel1' | 'channel2' = 'channel1',
+        channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1',
         retryCount: number = 0
     ): Promise<SEOStrategy> {
         const MAX_RETRIES = 3;
@@ -340,7 +340,7 @@ Return EXACTLY a JSON object with this structure:
      * Configuración de hashtags de nicho por canal
      * @requirement Guardrails de Nicho
      */
-    private static readonly NICHE_HASHTAG_CONFIG: Record<'channel1' | 'channel2', NicheHashtagConfig> = {
+    private static readonly NICHE_HASHTAG_CONFIG: Record<'channel1' | 'channel2' | 'channel3', NicheHashtagConfig> = {
         // Canal 1: NeuroSync AI - Autismo + IA
         channel1: {
             nicheTags: [
@@ -374,6 +374,20 @@ Return EXACTLY a JSON object with this structure:
             trendingTags: [
                 'fyp', 'parati', 'viral', 'trending', 'foryou', 'fypシ'
             ]
+        },
+        // Canal 3: ColombianDreamm - Curiosidades Universales & Misterios (Viral)
+        channel3: {
+            nicheTags: [
+                'curiosidades', 'misterio', 'sabiasque', 'datoscuriosos', 'universo',
+                'teorias', 'psicologia', 'datospsicologicos', 'datos', 'ciencia',
+                'historia', 'secretos', 'cosasquenosabias', 'enigmas', 'misterios'
+            ],
+            aiTags: [
+                'ia', 'chatgpt', 'inteligenciaartificial'
+            ],
+            trendingTags: [
+                'fyp', 'parati', 'viral', 'trending', 'foryou', 'fypシ'
+            ]
         }
     };
 
@@ -386,7 +400,7 @@ Return EXACTLY a JSON object with this structure:
      */
     static generatePlatformHashtags(
         baseStrategy: SEOStrategy,
-        channelKey: 'channel1' | 'channel2' = 'channel1'
+        channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1'
     ): PlatformHashtags {
         console.log(`🏷️ SEOAgent: Generando hashtags multiplataforma para ${channelKey === 'channel1' ? 'NeuroSync AI' : 'NeuroTech AI'}...`);
 
@@ -444,7 +458,7 @@ Return EXACTLY a JSON object with this structure:
     static generatePlatformDescriptions(
         baseStrategy: SEOStrategy,
         hashtags: PlatformHashtags,
-        channelKey: 'channel1' | 'channel2' = 'channel1'
+        channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1'
     ): PlatformDescriptions {
         console.log(`📝 SEOAgent: Generando descripciones multiplataforma optimizadas...`);
 
@@ -553,7 +567,7 @@ ${tiktokCTA}`.substring(0, 150);
      * Genera un hook optimizado para YouTube con keywords
      * @private
      */
-    private static generateYouTubeHook(topic: string, channelKey: 'channel1' | 'channel2'): string {
+    private static generateYouTubeHook(topic: string, channelKey: 'channel1' | 'channel2' | 'channel3'): string {
         const hooks = channelKey === 'channel1' 
             ? [
                 '🧩 ¿Sabías que la inteligencia artificial está revolucionando la forma en que las personas autistas interactúan con el mundo?',
@@ -598,7 +612,7 @@ ${tiktokCTA}`.substring(0, 150);
      * Genera un párrafo rico en keywords para SEO de YouTube
      * @private
      */
-    private static generateYouTubeKeywordParagraph(keywords: string[], channelKey: 'channel1' | 'channel2'): string {
+    private static generateYouTubeKeywordParagraph(keywords: string[], channelKey: 'channel1' | 'channel2' | 'channel3'): string {
         const contextualIntro = channelKey === 'channel1'
             ? 'En este video exploramos la intersección entre autismo e inteligencia artificial,'
             : 'En este video descubrimos cómo la IA puede potenciar la productividad de personas con TDAH,';
@@ -612,7 +626,7 @@ ${tiktokCTA}`.substring(0, 150);
      * Selecciona emojis apropiados para Instagram según el canal
      * @private
      */
-    private static selectInstagramEmojis(channelKey: 'channel1' | 'channel2'): Record<string, string> {
+    private static selectInstagramEmojis(channelKey: 'channel1' | 'channel2' | 'channel3'): Record<string, string> {
         return channelKey === 'channel1'
             ? {
                 main: '🧩',
@@ -714,7 +728,7 @@ ${tiktokCTA}`.substring(0, 150);
     static async generateMultiPlatformStrategy(
         language: string = 'Spanish',
         performanceContext?: string,
-        channelKey: 'channel1' | 'channel2' = 'channel1'
+        channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1'
     ): Promise<MultiPlatformSEOStrategy> {
         console.log(`🚀 SEOAgent: Generando estrategia SEO multiplataforma completa...`);
 

@@ -239,11 +239,13 @@ CORRESPONDENCE RULE: visualPrompts and comfyPrompts MUST have exactly the same n
      * @param seo The SEO Strategy containing the viral title and keywords
      * @param language The language of the script (e.g., "Spanish" or "English")
      */
-    public static async generateShortScript(seo: SEOStrategy, language: string = 'Spanish', channelKey: 'channel1' | 'channel2' = 'channel1'): Promise<VideoScript> {
-        const channelName = channelKey === 'channel1' ? 'NeuroSync AI' : 'NeuroTech AI';
+    public static async generateShortScript(seo: SEOStrategy, language: string = 'Spanish', channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1'): Promise<VideoScript> {
+        const channelName = channelKey === 'channel3' ? 'ColombianDreamm' : (channelKey === 'channel2' ? 'NeuroTech AI' : 'NeuroSync AI');
         logger.info(`Generando YouTube Short script para ${channelName}`, { language, topic: seo.rawTopic });
 
-        const channelContext = channelKey === 'channel2'
+        const channelContext = channelKey === 'channel3'
+            ? `The channel "ColombianDreamm" focuses on Universal Curiosities, Unexplained Mysteries, and Psychological Facts. Broad appeal, highly engaging viral hooks, mind-bending facts.`
+            : channelKey === 'channel2'
             ? `The channel "NeuroTech AI" focuses on AI productivity hacks, workplace automation, and digital business for ADHD & Neurodivergent individuals.`
             : `The channel "NeuroSync AI" focuses on Autism & Artificial Intelligence: empowering autistic minds, cognitive tools, sensory support, and social skills through AI.`;
 
@@ -369,7 +371,7 @@ The JSON must have this exact structure:
      * @param seo The SEO Strategy containing the viral title and keywords
      * @param language The language of the script (e.g., "Spanish" or "English")
      */
-    public static async generateLongScript(seo: SEOStrategy, language: string = 'Spanish', channelKey: 'channel1' | 'channel2' = 'channel1'): Promise<VideoScript> {
+    public static async generateLongScript(seo: SEOStrategy, language: string = 'Spanish', channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1'): Promise<VideoScript> {
         const channelName = channelKey === 'channel1' ? 'NeuroSync AI' : 'NeuroTech AI';
         logger.info(`Generando Long-Form YouTube script para ${channelName}`, { language, topic: seo.rawTopic });
 

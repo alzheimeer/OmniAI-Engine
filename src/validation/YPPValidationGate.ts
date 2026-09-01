@@ -168,7 +168,7 @@ export interface ProgressAlert {
   /** Tipo de alerta activada, null si no hay alerta */
   alertType: AlertType | null;
   /** Canal que generó la alerta */
-  channelKey: 'channel1' | 'channel2';
+  channelKey: 'channel1' | 'channel2' | 'channel3';
   /** Porcentaje de progreso actual hacia el objetivo (0-100+) */
   currentProgress: number;
   /** Mensaje descriptivo de la alerta */
@@ -187,7 +187,7 @@ export interface MilestoneAlertResult {
   /** Indica si se debe enviar la alerta (true cuando se cruzó un milestone) */
   shouldAlert: boolean;
   /** Canal que alcanzó el milestone */
-  channelKey: 'channel1' | 'channel2';
+  channelKey: 'channel1' | 'channel2' | 'channel3';
   /** Milestone alcanzado: 80 (cerca del objetivo) o 100 (elegible YPP) */
   milestone: number;
   /** Progreso actual en porcentaje para cada métrica */
@@ -430,7 +430,7 @@ export interface WeeklyProgressReport {
  */
 export interface ChannelMonetizationStatus {
   /** Identificador del canal ('channel1' o 'channel2') */
-  channelKey: 'channel1' | 'channel2';
+  channelKey: 'channel1' | 'channel2' | 'channel3';
   /** Indica si el canal está monetizado (YPP aprobado y activo) */
   isMonetized: boolean;
   /** Indica si el canal cumple los requisitos técnicos de YPP (suscriptores + watch time/Shorts) */
@@ -651,7 +651,7 @@ export interface ProgressSnapshot {
   /** ID único del snapshot (auto-generado en memoria, será PRIMARY KEY en SQLite) */
   id?: number;
   /** Canal al que pertenece el snapshot */
-  channelKey: 'channel1' | 'channel2';
+  channelKey: 'channel1' | 'channel2' | 'channel3';
   /** Momento de captura del snapshot */
   timestamp: Date;
   /** Número de suscriptores al momento del snapshot */
@@ -672,7 +672,7 @@ export interface ProgressSnapshot {
  */
 export interface ProgressHistoryQuery {
   /** Canal a filtrar. Si no se especifica, retorna ambos canales */
-  channelKey?: 'channel1' | 'channel2';
+  channelKey?: 'channel1' | 'channel2' | 'channel3';
   /** Fecha de inicio del rango (inclusive) */
   startDate?: Date;
   /** Fecha de fin del rango (inclusive) */
@@ -731,10 +731,10 @@ export class YPPValidationGate {
   private readonly overrideLogs: OverrideLogEntry[] = [];
 
   /** Caché de datos de YouTube Analytics por canal (clave: channelKey, valor: datos cacheados) */
-  private readonly analyticsCache: Map<'channel1' | 'channel2', YouTubeAnalyticsCacheEntry> = new Map();
+  private readonly analyticsCache: Map<'channel1' | 'channel2' | 'channel3', YouTubeAnalyticsCacheEntry> = new Map();
 
   /** Caché de datos de YouTube Analytics V2 por canal (para método fetchYouTubeAnalyticsV2) */
-  private readonly analyticsCacheV2: Map<'channel1' | 'channel2', YouTubeAnalyticsCacheEntryV2> = new Map();
+  private readonly analyticsCacheV2: Map<'channel1' | 'channel2' | 'channel3', YouTubeAnalyticsCacheEntryV2> = new Map();
 
   /** 
    * Almacenamiento en memoria para histórico de progreso.
@@ -1617,7 +1617,7 @@ ${nextMilestone}
    * ```
    */
   public checkProgressAlerts(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     metrics: YPPMetrics
   ): ProgressAlert[] {
     const alerts: ProgressAlert[] = [];
@@ -2136,7 +2136,7 @@ ${nextMilestone}
    * ```
    */
   public async fetchYouTubeAnalytics(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     dateRange?: { start: Date; end: Date }
   ): Promise<YouTubeAnalyticsData> {
     // Verificar si hay datos en caché válidos
@@ -2187,7 +2187,7 @@ ${nextMilestone}
    * Obtiene datos reales usando YouTube Analytics API y YouTube Data API para YPP.
    */
   private async fetchRealYouTubeAnalytics(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     channelId: string,
     startDate: Date,
     endDate: Date,
@@ -2248,7 +2248,7 @@ ${nextMilestone}
    * Obtiene la configuración del canal según su clave.
    * @param channelKey - Clave del canal ('channel1' o 'channel2')
    */
-  private getChannelConfig(channelKey: 'channel1' | 'channel2'): {
+  private getChannelConfig(channelKey: 'channel1' | 'channel2' | 'channel3'): {
     channelId: string;
     channelName: string;
     tokenFile: string;
@@ -2264,6 +2264,11 @@ ${nextMilestone}
         channelName: 'NeuroTech AI',
         tokenFile: 'oauth2.tokens.channel2.json',
       },
+      channel3: {
+        channelId: 'UC_COLOMBIANDREAMM',
+        channelName: 'ColombianDreamm',
+        tokenFile: 'oauth2.tokens.channel3.json',
+      }
     };
     return configs[channelKey];
   }
@@ -2279,7 +2284,7 @@ ${nextMilestone}
    * @returns Datos mock mapeados a YouTubeAnalyticsData
    */
   private async fetchMockYouTubeAnalytics(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     channelId: string,
     startDate: Date,
     endDate: Date
@@ -2370,7 +2375,7 @@ ${nextMilestone}
    * 
    * @param channelKey - Canal a invalidar ('channel1' o 'channel2'). Si no se especifica, invalida todos.
    */
-  public invalidateAnalyticsCache(channelKey?: 'channel1' | 'channel2'): void {
+  public invalidateAnalyticsCache(channelKey?: 'channel1' | 'channel2' | 'channel3'): void {
     if (channelKey) {
       this.analyticsCache.delete(channelKey);
     } else {
@@ -2384,7 +2389,7 @@ ${nextMilestone}
    * @param channelKey - Canal a verificar
    * @returns true si hay caché válido, false si no hay o expiró
    */
-  public hasValidAnalyticsCache(channelKey: 'channel1' | 'channel2'): boolean {
+  public hasValidAnalyticsCache(channelKey: 'channel1' | 'channel2' | 'channel3'): boolean {
     const cachedEntry = this.analyticsCache.get(channelKey);
     return cachedEntry !== undefined && cachedEntry.expiresAt > new Date();
   }
@@ -2431,7 +2436,7 @@ ${nextMilestone}
    * ```
    */
   public async fetchYouTubeAnalyticsV2(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     config?: YouTubeAnalyticsConfig
   ): Promise<YouTubeAnalyticsDataV2> {
     // Determinar TTL del cache (por defecto 1 hora)
@@ -2480,7 +2485,7 @@ ${nextMilestone}
    * @returns Datos reales mapeados a YouTubeAnalyticsDataV2
    */
   private async fetchRealYouTubeAnalyticsV2(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     tokenPath: string
   ): Promise<YouTubeAnalyticsDataV2> {
     const auth = await GoogleAuth.getClient(tokenPath);
@@ -2540,7 +2545,7 @@ ${nextMilestone}
    * @returns Datos mock mapeados a YouTubeAnalyticsDataV2
    */
   private async fetchMockYouTubeAnalyticsV2(
-    channelKey: 'channel1' | 'channel2'
+    channelKey: 'channel1' | 'channel2' | 'channel3'
   ): Promise<YouTubeAnalyticsDataV2> {
     // Simular latencia de API realista (100-300ms)
     await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200));
@@ -2565,6 +2570,14 @@ ${nextMilestone}
         baseShortsViews: 1_200_000,
         baseRevenue: 0, // Aún no monetizado
       },
+      channel3: {
+        channelId: 'UC_COLOMBIANDREAMM',
+        baseSubscribers: 385,
+        baseWatchTimeHours: 10,
+        baseViews: 25000,
+        baseShortsViews: 85000,
+        baseRevenue: 0, 
+      }
     };
 
     const channelConfig = channelConfigs[channelKey];
@@ -2600,7 +2613,7 @@ ${nextMilestone}
    * 
    * @param channelKey - Canal a invalidar ('channel1' o 'channel2'). Si no se especifica, invalida todos.
    */
-  public invalidateAnalyticsCacheV2(channelKey?: 'channel1' | 'channel2'): void {
+  public invalidateAnalyticsCacheV2(channelKey?: 'channel1' | 'channel2' | 'channel3'): void {
     if (channelKey) {
       this.analyticsCacheV2.delete(channelKey);
     } else {
@@ -2614,7 +2627,7 @@ ${nextMilestone}
    * @param channelKey - Canal a verificar
    * @returns true si hay caché válido, false si no hay o expiró
    */
-  public hasValidAnalyticsCacheV2(channelKey: 'channel1' | 'channel2'): boolean {
+  public hasValidAnalyticsCacheV2(channelKey: 'channel1' | 'channel2' | 'channel3'): boolean {
     const cachedEntry = this.analyticsCacheV2.get(channelKey);
     return cachedEntry !== undefined && cachedEntry.expiresAt > new Date();
   }
@@ -2935,7 +2948,7 @@ _"Autism is not a system error, it's a different operating system."_
    * ```
    */
   public checkMilestoneAlert(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     currentMetrics: { subscribers: number; watchTimeHours: number },
     previousProgress?: { subscribers: number; watchTime: number }
   ): MilestoneAlertResult {
@@ -3275,7 +3288,7 @@ _"Cada video es un paso más hacia tu meta."_
    * ```
    */
   public async getLatestSnapshot(
-    channelKey: 'channel1' | 'channel2'
+    channelKey: 'channel1' | 'channel2' | 'channel3'
   ): Promise<ProgressSnapshot | null> {
     // Obtener con límite 1 para eficiencia
     const results = await this.getProgressHistory({
@@ -3340,7 +3353,7 @@ _"Cada video es un paso más hacia tu meta."_
    * 
    * @requirement REQ-5.4.10
    */
-  public getProgressHistoryCount(channelKey?: 'channel1' | 'channel2'): number {
+  public getProgressHistoryCount(channelKey?: 'channel1' | 'channel2' | 'channel3'): number {
     if (channelKey) {
       return this.progressHistory.filter(s => s.channelKey === channelKey).length;
     }
@@ -3355,7 +3368,7 @@ _"Cada video es un paso más hacia tu meta."_
    * 
    * @requirement REQ-5.4.10
    */
-  public clearProgressHistory(channelKey?: 'channel1' | 'channel2'): void {
+  public clearProgressHistory(channelKey?: 'channel1' | 'channel2' | 'channel3'): void {
     if (channelKey) {
       // Filtrar y mantener solo los del otro canal
       const toKeep = this.progressHistory.filter(s => s.channelKey !== channelKey);

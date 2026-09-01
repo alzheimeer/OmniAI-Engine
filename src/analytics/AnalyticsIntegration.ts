@@ -168,7 +168,7 @@ export interface AlertCheckResult {
   /** Lista de alertas detectadas (vacía si no hay problemas) */
   alerts: PerformanceAlert[];
   /** Canal verificado */
-  channelKey: 'channel1' | 'channel2';
+  channelKey: 'channel1' | 'channel2' | 'channel3';
   /** Momento de la verificación */
   checkedAt: Date;
 }
@@ -181,7 +181,7 @@ export interface AlertCheckResult {
  */
 export interface RetentionDataForSEO {
   /** Canal al que pertenecen los datos */
-  channelKey: 'channel1' | 'channel2';
+  channelKey: 'channel1' | 'channel2' | 'channel3';
   /** Retención promedio de todos los videos (porcentaje) */
   averageRetention: number;
   /** Retención promedio de videos cortos/Shorts (porcentaje) */
@@ -336,7 +336,7 @@ export class AnalyticsIntegration {
   private readonly cache: Map<CacheKey, AnalyticsCacheEntry> = new Map();
 
   /** Configuración de datos mock por canal */
-  private static readonly CHANNEL_CONFIGS: Record<'channel1' | 'channel2', ChannelMockConfig> = {
+  private static readonly CHANNEL_CONFIGS: Record<'channel1' | 'channel2' | 'channel3', ChannelMockConfig> = {
     channel1: {
       channelId: 'UC_NEUROSYNC_AI',
       channelName: 'NeuroSync AI',
@@ -362,6 +362,18 @@ export class AnalyticsIntegration {
       baseAvgViewPercentage: 42, // 42% retención promedio
       baseSubscribersGained: 38,
       subscriberLossRate: 0.15, // 15% de churn (más alto en canales nuevos)
+    },
+    channel3: {
+      channelId: 'UC_COLOMBIANDREAMM',
+      channelName: 'ColombianDreamm',
+      baseWatchTimeMinutes: 200000, 
+      baseCtr: 7.5, 
+      baseImpressions: 1000000,
+      baseViews: 75000,
+      baseAvgViewDuration: 280, 
+      baseAvgViewPercentage: 55, 
+      baseSubscribersGained: 150,
+      subscriberLossRate: 0.08,
     },
   };
 
@@ -451,7 +463,7 @@ export class AnalyticsIntegration {
    * ```
    */
   public async getChannelMetrics(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     dateRange?: DateRange
   ): Promise<AnalyticsMetrics> {
     // Usar últimos 28 días si no se especifica rango
@@ -494,7 +506,7 @@ export class AnalyticsIntegration {
    * ```
    */
   public async getWatchTimeAndCTR(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     dateRange?: DateRange
   ): Promise<WatchTimeAndCTR> {
     const metrics = await this.getChannelMetrics(channelKey, dateRange);
@@ -529,7 +541,7 @@ export class AnalyticsIntegration {
    * ```
    */
   public async getLastNDaysMetrics(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     days: number
   ): Promise<AnalyticsMetrics> {
     const endDate = new Date();
@@ -569,7 +581,7 @@ export class AnalyticsIntegration {
    * ```
    */
   public async getMetricsByVideoType(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     videoType: VideoType,
     dateRange?: DateRange
   ): Promise<AnalyticsMetrics> {
@@ -612,7 +624,7 @@ export class AnalyticsIntegration {
    * ```
    */
   public async getSegmentedMetrics(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     dateRange?: DateRange
   ): Promise<SegmentedMetrics> {
     // Obtener métricas combinadas como base
@@ -660,7 +672,7 @@ export class AnalyticsIntegration {
    * ```
    */
   public async compareVideoTypes(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     dateRange?: DateRange
   ): Promise<VideoTypeComparison> {
     const segmented = await this.getSegmentedMetrics(channelKey, dateRange);
@@ -722,7 +734,7 @@ export class AnalyticsIntegration {
    * ```
    */
   public async getRetentionDataForSEO(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     dateRange?: DateRange
   ): Promise<RetentionDataForSEO> {
     // Obtener métricas segmentadas para analizar Shorts vs Largos
@@ -839,7 +851,7 @@ export class AnalyticsIntegration {
    * ```
    */
   public async checkPerformanceAlerts(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     dateRange?: DateRange
   ): Promise<AlertCheckResult> {
     // Obtener métricas del canal
@@ -987,7 +999,7 @@ export class AnalyticsIntegration {
    * 
    * @param channelKey - Canal a invalidar. Si no se especifica, invalida todos.
    */
-  public invalidateCache(channelKey?: 'channel1' | 'channel2'): void {
+  public invalidateCache(channelKey?: 'channel1' | 'channel2' | 'channel3'): void {
     if (channelKey) {
       // Eliminar entradas que empiecen con el channelKey
       for (const key of this.cache.keys()) {
@@ -1008,7 +1020,7 @@ export class AnalyticsIntegration {
    * @returns true si hay caché válido, false si no hay o expiró
    */
   public hasValidCache(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     dateRange?: DateRange
   ): boolean {
     const effectiveRange = dateRange ?? this.getDefaultDateRange();
@@ -1069,7 +1081,7 @@ export class AnalyticsIntegration {
    * @returns Métricas del canal
    */
   private async fetchMetrics(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     dateRange: DateRange
   ): Promise<AnalyticsMetrics> {
     const shouldUseMock = this.config.useMockData || !this.config.apiKey;
@@ -1091,7 +1103,7 @@ export class AnalyticsIntegration {
    * Obtiene métricas reales de YouTube Analytics y Data API.
    */
   private async fetchRealMetrics(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     dateRange: DateRange,
     tokenPath: string
   ): Promise<AnalyticsMetrics> {
@@ -1154,7 +1166,7 @@ export class AnalyticsIntegration {
    * @returns Métricas mock
    */
   private async fetchMockMetrics(
-    channelKey: 'channel1' | 'channel2',
+    channelKey: 'channel1' | 'channel2' | 'channel3',
     dateRange: DateRange
   ): Promise<AnalyticsMetrics> {
     // Simular latencia de API realista si está configurado

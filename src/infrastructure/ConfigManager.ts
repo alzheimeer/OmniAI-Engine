@@ -141,7 +141,7 @@ export interface ChannelConfig {
 /**
  * Canales disponibles en el sistema
  */
-export type ChannelId = 'channel1' | 'channel2';
+export type ChannelId = 'channel1' | 'channel2' | 'channel3';
 
 // ===== TIPOS DE VALIDACIÓN =====
 

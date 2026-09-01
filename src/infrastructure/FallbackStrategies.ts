@@ -68,7 +68,7 @@ export interface DeferredPublishData {
         isShort?: boolean;
         visualPrompt?: string;
     };
-    channelKey: 'channel1' | 'channel2';
+    channelKey: 'channel1' | 'channel2' | 'channel3';
     scheduledTime?: Date;
     createdAt: Date;
     retryCount: number;
@@ -453,7 +453,7 @@ export class FallbackStrategies {
             isShort?: boolean;
             visualPrompt?: string;
         },
-        channelKey: 'channel1' | 'channel2' = 'channel1',
+        channelKey: 'channel1' | 'channel2' | 'channel3' = 'channel1',
         error?: RetryError
     ): Promise<FallbackResult<DeferredPublishData>> {
         const logMeta: LogMeta = {

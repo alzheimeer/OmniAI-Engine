@@ -1106,7 +1106,7 @@ describe('YPPValidationGate', () => {
   describe('canCreateNewChannel', () => {
     // Helper para crear estado de monetización de canal
     const createChannelStatus = (
-      channelKey: 'channel1' | 'channel2',
+      channelKey: 'channel1' | 'channel2' | 'channel3',
       overrides: Partial<Omit<ChannelMonetizationStatus, 'channelKey'>> = {}
     ): ChannelMonetizationStatus => ({
       channelKey,

@@ -18,7 +18,7 @@ import { ThumbnailColorScheme, ThumbnailTemplate, ALL_TEMPLATES, TEMPLATES_BY_ID
 /**
  * Identificador de canal soportado
  */
-export type ChannelId = 'channel1' | 'channel2';
+export type ChannelId = 'channel1' | 'channel2' | 'channel3';
 
 /**
  * Información básica del canal
@@ -184,6 +184,37 @@ export const CHANNEL2_BRANDING: ChannelBrandingConfig = {
     preferredMoodTags: ['energía', 'productividad', 'motivación', 'tech', 'acción']
 };
 
+// ===== CONFIGURACIÓN CANAL 3: ColombianDreamm =====
+
+export const CHANNEL3_BRANDING: ChannelBrandingConfig = {
+    id: 'channel3',
+    info: {
+        name: 'ColombianDreamm',
+        niche: 'Curiosidades Universales & Misterios',
+        description: 'Explorando lo desconocido, misterios universales y curiosidades que volarán tu mente.',
+        targetAudience: 'Entusiastas del misterio, curiosos y amantes de la psicología',
+        tone: 'misterioso, cautivador, viral'
+    },
+    colors: {
+        primary: '#4B0082',      // Indigo oscuro
+        secondary: '#000000',    // Negro
+        accent: '#FFD700',       // Dorado/Amarillo
+        accentAlt: '#FF4500',    // Naranja rojizo
+        gradient: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
+        overlay: 'rgba(15, 12, 41, 0.7)'
+    },
+    typography: {
+        fontFamily: "'Oswald', 'Impact', sans-serif",
+        fontWeight: 700,
+        textTransform: 'uppercase',
+        textShadow: '2px 2px 4px rgba(0,0,0,0.8)'
+    },
+    preferredTemplates: ['cyber', 'minimal', 'corporate'],
+    defaultTemplate: 'cyber',
+    signatureEmojis: ['🤯', '👽', '👁️', '✨', '🧠'],
+    preferredMoodTags: ['misterio', 'curiosidades', 'viral', 'sorprendente']
+};
+
 // ===== MAPA DE BRANDING POR CANAL =====
 
 /**
@@ -191,7 +222,8 @@ export const CHANNEL2_BRANDING: ChannelBrandingConfig = {
  */
 export const CHANNEL_BRANDING_MAP: Record<ChannelId, ChannelBrandingConfig> = {
     'channel1': CHANNEL1_BRANDING,
-    'channel2': CHANNEL2_BRANDING
+    'channel2': CHANNEL2_BRANDING,
+    'channel3': CHANNEL3_BRANDING
 };
 
 // ===== CLASE DE SERVICIO DE BRANDING =====
@@ -212,7 +244,7 @@ export class ChannelBrandingService {
     /**
      * Obtiene la configuración de branding para un canal específico
      * 
-     * @param channelId - ID del canal ('channel1' | 'channel2')
+     * @param channelId - ID del canal ('channel1' | 'channel2' | 'channel3')
      * @returns Configuración de branding del canal
      */
     public static getBranding(channelId: ChannelId): ChannelBrandingConfig {
@@ -431,7 +463,7 @@ export class ChannelBrandingService {
      * @returns Array de IDs de canales
      */
     public static getAllChannels(): ChannelId[] {
-        return ['channel1', 'channel2'];
+        return ['channel1', 'channel2', 'channel3'];
     }
     
     /**
@@ -450,6 +482,11 @@ export class ChannelBrandingService {
                 name: CHANNEL2_BRANDING.info.name,
                 niche: CHANNEL2_BRANDING.info.niche,
                 accent: CHANNEL2_BRANDING.colors.accent
+            },
+            'channel3': {
+                name: CHANNEL3_BRANDING.info.name,
+                niche: CHANNEL3_BRANDING.info.niche,
+                accent: CHANNEL3_BRANDING.colors.accent
             }
         };
     }
