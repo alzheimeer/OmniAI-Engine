@@ -464,3 +464,8 @@ En la raíz del proyecto existen varios scripts `.mjs` (ej. `test-thumbnail-sync
 | "Invalid video keywords" | Tags con caracteres `<>` | Automático: YouTubePublisher sanitiza tags |
 | Thumbnail upload failed | Canal sin verificar | Verificar canal con teléfono en YouTube Studio |
 | Videos no aparecen | Publicados como privados | Cambiar a public en código o YouTube Studio |
+
+## [2026-09-01] Operación Viralidad y Des-Shadowban
+- **Tercer Canal (ColombianDreamm)**: Inyección profunda de channel3 en todo el sistema. Nicho configurado: Curiosidades Universales, Misterios y Datos Psicológicos.
+- **Protocolo Des-Shadowban**: Reducción de frecuencia de publicación de channel1 y channel2 a 1 Short cada 48 horas (Inglés) y 1 Video Largo semanal.
+- **Canal Viral (channel3)**: Configurado a 1 Short diario (Inglés) y 1 Video Largo dominical.
