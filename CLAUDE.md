@@ -26,6 +26,7 @@ El código fuente se encuentra en `src/`:
 
 ### 1. `src/agents/` (Los Cerebros)
 - **`SEOAgent.ts`**: El cerebro de marketing. Consulta a DeepSeek para descubrir tendencias virales bajo barreras estrictas de nicho (**Autismo e Inteligencia Artificial**), formula títulos hiper-optimizados, genera 15-20 keywords exactas y analiza métricas históricas de la base de datos para retroalimentación autónoma.
+  - **NUEVO:** Grounding Empírico / RAG RSS (`rss-parser`). Extrae noticias reales diarias de *Spectrum News* (Autismo) o *ScienceDaily* (IA) para anclar el conocimiento del LLM y evitar contenido genérico (AI Slop).
   - **NUEVO:** Sistema de deduplicación integrado:
     - Carga los últimos 50 temas de videos (o 30 de blogs) antes de generar
     - Incluye lista de temas previos en el prompt del LLM
@@ -258,7 +259,7 @@ El sistema usa **Image-to-Video (I2V)** para mayor control visual en segmentos i
   - **NUEVO:** Sanitización de tags - elimina caracteres inválidos (`<`, `>`, etc.)
   - `notifySubscribers` inteligente: true para largos, false para Shorts
   - Default a `public` para máxima discoverabilidad
-- **Estrategia de Publicación Híbrida:** 1 de cada 5 videos se publica como **privado/no listado**. Esto permite que un humano revise el contenido y lo publique manualmente, garantizando interacción humana consistente y evitando el "shadowban de API" por automatización 100%.
+- **Estrategia YMYL Automatizada:** Publicación 100% automatizada (pública por defecto) reemplazando la antigua intervención humana. Inyecta obligatoriamente un disclaimer médico/educativo anti-"AI Slop" para mitigar revisiones de Trust & Safety.
 - **`HashnodePublisher.ts`**: Publicación en Hashnode mediante Puppeteer en modo silencioso (soporta Docker).
 - **`MediumPublisher.ts`**: Publicación en Medium mediante Puppeteer.
 - **`DevToPublisher.ts`**: Publicación en Dev.to mediante la API oficial REST.
@@ -346,7 +347,7 @@ Auditoría SEO completa documentada en `docs/AUDITORIA-SEO-YOUTUBE.md`.
 | **Dual Prompts** | `ScriptGenerator.ts` | **NUEVO** - `visualPrompts` (Pexels) + `comfyPrompts` (ComfyUI 20-50 palabras) |
 | **Video Source Router** | `VideoSourceRouter.ts` | **NUEVO** - Orquestador de fuentes con fallback automático y tracking de uso |
 | **Clip Pool** | `ClipPoolManager.ts` | **NUEVO** - Pool de clips pre-generados por categoría (6 categorías) |
-| **Estrategia Híbrida** | `YouTubePublisher.ts` | **NUEVO** - Publica 1 de cada 5 videos en privado como borrador |
+| **Disclaimer YMYL** | `YouTubePublisher.ts` | **NUEVO** - Inyecta disclaimer educativo automático anti-Slop |
 | **Fatiga Semántica** | `SEOAgent.ts` / `ScriptGenerator.ts` | **NUEVO** - Inyección de Personas, Títulos max 8 palabras, Blacklist de IA, y formato Multi-Voz en guiones (25%) |
 | **Máscara TTS** | `AudioGenerator.ts` | **NUEVO** - **Formant Shift** (`asetrate*1.02,aresample,atempo=0.9804`) - indetectable, reemplaza atempo |
 | **Retención Extrema** | `VideoRenderer.ts` / `AudioMixer.ts` | **NUEVO** - **Glitch RGB** (0.5s) seguro para epilepsia - reemplaza strobing de 3s |
@@ -359,7 +360,7 @@ Auditoría SEO completa documentada en `docs/AUDITORIA-SEO-YOUTUBE.md`.
 **Problema resuelto:** Mitigar el riesgo de que YouTube detecte la automatización (Shadowban por API), monotonía de los LLMs (fatiga semántica) y mejorar la retención en los primeros 3 segundos.
 
 **Solución implementada:**
-1. **Estrategia Híbrida (API Evasion):** 1 de cada 5 videos se marca como `private` en `YouTubePublisher.ts`. Esto rompe el patrón automatizado y fuerza la publicación manual.
+1. **Automatización 100% y YMYL Shield:** Se removió la estrategia de borrador manual. Publicación 100% pública y autónoma. Se inyecta un *Disclaimer* automatizado anti-Slop en las descripciones y se usa RAG RSS en `SEOAgent` para dotar al canal de credibilidad y evitar strikes por desinformación.
 2. **Romper Fatiga Semántica:** `SEOAgent` utiliza temperatura aleatoria (0.7-0.9), bloquea frases cliché de IA y asume Personas (Académico, Amigo, Periodista). Títulos truncados a 8 palabras máximo. `ScriptGenerator` inyecta formato "Multi-Voz/Entrevista" aleatoriamente.
 3. **Máscara TTS y Zero-Silence:** Uso de `silenceremove` en `AudioGenerator` para cortar milisegundos muertos al inicio. El 25% de los audios reciben **Formant Shift** (`asetrate*1.02,aresample,atempo=0.9804`) para desdibujar la firma acústica de Google TTS de forma indetectable.
 4. **Impacto Máximo (Hook):** `AudioMixer` inyecta ruido rosa filtrado (`anoisesrc`) como impacto en el segundo 0.0. `VideoRenderer` aplica un filtro **Glitch RGB** (aberración cromática con `rgbashift` y variación de brillo) durante los primeros 0.5 segundos de cualquier video, reemplazando el anterior strobing epiléptico de 3s.

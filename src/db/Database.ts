@@ -148,6 +148,20 @@ export class Database {
             
             // Índice para consultar estructuras recientes por canal
             this.db?.run(`CREATE INDEX IF NOT EXISTS idx_structure_channel ON structure_usage(channelId, createdAt DESC)`);
+
+            // Tabla de Ideas Virales detectadas por el SEO Daemon
+            this.db?.run(`
+                CREATE TABLE IF NOT EXISTS trending_ideas (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    topic TEXT NOT NULL,
+                    title TEXT NOT NULL,
+                    keywords TEXT NOT NULL,
+                    score INTEGER DEFAULT 0,
+                    source TEXT DEFAULT 'google-trends',
+                    status TEXT DEFAULT 'pending',
+                    createdAt DATETIME DEFAULT CURRENT_TIMESTAMP
+                )
+            `);
         });
     }
 
@@ -563,4 +577,48 @@ export class Database {
             );
         });
     }
+
+    // ===== FUNCIONES PARA SEO DAEMON =====
+
+    public static saveTrendingIdea(topic: string, title: string, keywords: string[], score: number, source: string): Promise<number> {
+        return new Promise((resolve, reject) => {
+            const db = this.getDB();
+            db.run(
+                `INSERT INTO trending_ideas (topic, title, keywords, score, source, status) VALUES (?, ?, ?, ?, ?, 'pending')`,
+                [topic, title, JSON.stringify(keywords), score, source],
+                function(err) {
+                    if (err) reject(err);
+                    else {
+                        console.log(`📊 Database: Nueva idea viral guardada: ${title} (Score: ${score})`);
+                        resolve(this.lastID);
+                    }
+                }
+            );
+        });
+    }
+
+    public static getPendingTrendingIdeas(limit: number = 1): Promise<any[]> {
+        return new Promise((resolve, reject) => {
+            const db = this.getDB();
+            db.all(
+                `SELECT * FROM trending_ideas WHERE status = 'pending' ORDER BY score DESC LIMIT ?`,
+                [limit],
+                (err, rows) => {
+                    if (err) reject(err);
+                    else resolve(rows);
+                }
+            );
+        });
+    }
+
+    public static markTrendingIdeaAsUsed(id: number): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const db = this.getDB();
+            db.run(`UPDATE trending_ideas SET status = 'used' WHERE id = ?`, [id], (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    }
 }
+

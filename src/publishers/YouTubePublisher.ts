@@ -97,28 +97,10 @@ export class YouTubePublisher {
         
         // Build optimized description with hashtags
         const hashtagString = sanitizedTags.slice(0, 15).map(tag => `#${tag.replace(/\s+/g, '')}`).join(' ');
-        const optimizedDescription = `${metadata.description}${shortsTag}\n\n${hashtagString}`;
+        const disclaimer = "\n\n⚠️ Disclaimer: Este contenido fue sintetizado con asistencia de Inteligencia Artificial para fines educativos. No constituye asesoramiento médico, psicológico ni profesional sobre el autismo o la neurodiversidad.";
+        const optimizedDescription = `${metadata.description}${shortsTag}\n\n${hashtagString}${disclaimer}`;
 
-        // Estrategia Híbrida (1 de cada 5 videos como Borrador/Privado)
-        const stateFile = path.join(__dirname, '../../content', 'youtube_publish_state.json');
-        let publishCount = 1;
-        if (fs.existsSync(stateFile)) {
-            try {
-                const stateData = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
-                publishCount = (stateData.count || 0) + 1;
-            } catch (e) {
-                logger.warn('No se pudo leer el estado de publicación, reiniciando contador');
-            }
-        }
-        
-        let finalPrivacyStatus = metadata.privacyStatus || 'public';
-        if (publishCount >= 5) {
-            finalPrivacyStatus = 'private'; // Borrador
-            logger.info('Estrategia Híbrida activa: Guardando video como PRIVADO (Borrador manual) al ser el 5to video.');
-            publishCount = 0; // Reiniciar contador
-        }
-        
-        fs.writeFileSync(stateFile, JSON.stringify({ count: publishCount }));
+        const finalPrivacyStatus = metadata.privacyStatus || 'public';
 
         try {
             // REQ-4.4.2: Aplicar retry con backoff exponencial a llamadas YouTube API

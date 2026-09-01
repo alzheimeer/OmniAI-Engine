@@ -15,7 +15,7 @@ El código fuente se encuentra en `src/`:
 - **`src/db/Database.ts`**: Gestor de base de datos **SQLite** (`content/database.sqlite`). Registra publicaciones de videos y blogs, vistas, likes y suscriptores para análisis histórico.
 
 ### 1. `src/agents/` (Los Cerebros)
-- **`SEOAgent.ts`**: El cerebro de marketing. Consulta a DeepSeek para descubrir tendencias virales bajo barreras estrictas de nicho (**Autismo e Inteligencia Artificial**), formula títulos hiper-optimizados, genera 15-20 keywords exactas y analiza métricas históricas de la base de datos para retroalimentación autónoma.
+- **`SEOAgent.ts`**: El cerebro de marketing. Consulta a DeepSeek para descubrir tendencias virales bajo barreras estrictas de nicho (**Autismo e Inteligencia Artificial**), formula títulos hiper-optimizados, genera 15-20 keywords exactas y analiza métricas históricas de la base de datos para retroalimentación autónoma. **(NUEVO)** Implementa Grounding Empírico RAG mediante `rss-parser` para consultar feeds de *Spectrum News* y *ScienceDaily* y evitar el "AI Slop".
 - **`AnalyticsEngine.ts`**: Motor de analíticas que consulta en tiempo real la **YouTube Data API v3** (`youtube.videos.list`, `youtube.channels.list`), extrae reproducciones, likes y suscriptores, y actualiza la base de datos SQLite.
 
 ### 2. `src/generators/` (Los Creadores)
@@ -166,7 +166,7 @@ const result = await client.generateForI2V(
 ### 3. `src/publishers/` y `src/orchestration/` (Los Distribuidores)
 - **`MultiPlatformDispatcher.ts`**: Toma los videos generados desde la cola `PublishQueue` y les aplica un **retraso aleatorio de 0 a 45 minutos** antes de publicar en YouTube, rompiendo los patrones exactos de publicación detectables por el algoritmo. Además de esto orquesta a TikTok e Instagram.
 - **`YouTubePublisher.ts`**: Utiliza Google OAuth2 para subir los videos generados directamente al canal de YouTube. Inyecta automáticamente los tags del SEOAgent como hashtags en la descripción.
-  - **Estrategia de Publicación Híbrida:** 1 de cada 5 videos se publica como **privado/no listado** en lugar de público. Esto permite que un humano revise el contenido y lo publique manualmente, garantizando interacción humana consistente y evitando el "shadowban de API" por patrones de publicación 100% automatizados.
+  - **Estrategia YMYL Automatizada:** Publicación 100% automatizada (pública por defecto) reemplazando la antigua intervención humana. Inyecta obligatoriamente un disclaimer médico/educativo anti-"AI Slop" para mitigar revisiones de Trust & Safety.
 - **`InstagramPublisher.ts` / `TikTokPublisher.ts`**: Totalmente funcionales mediante inyección de Cookies y `Puppeteer Stealth`. Suben el material respectivo (Reels de 30s y TikToks de 15s) automáticamente, sin embargo, **ESTÁN BLOQUEADOS** de ejecutarse debido al `YPPValidationGate` (Regla de oro #2) hasta que la API verifique el "primer dólar" en YouTube.
 - **Plataformas de Blog (`HashnodePublisher`, `MediumPublisher`, `DevToPublisher`)**: Soportan la publicación usando Puppeteer o API. Actualmente la ejecución se rige por el flag `ENABLE_BLOG_PUBLISHING`.
 - **`HashnodePublisher.ts`**: Publicación en Hashnode mediante Puppeteer en modo silencioso (soporta Docker).
@@ -234,7 +234,7 @@ Implementación exhaustiva según spec `omniai-v2-optimization`, enfocada en eva
 6. **Infraestructura Avanzada (Fase 6):**
    - `CircuitBreaker`, Dead-Letter Queue (BullMQ) y endpoints de métricas.
 7. **Evasión de Detección y Retención (Actualizado Agosto 2026):**
-   - Estrategia híbrida en `YouTubePublisher.ts` (1 de cada 5 videos en privado para revisión humana).
+   - **Automatización 100% y YMYL Shield:** Se removió la estrategia de borrador manual. Publicación 100% pública y autónoma. Se inyecta un *Disclaimer* automatizado anti-Slop en las descripciones y se usa RAG RSS en `SEOAgent` para dotar al canal de credibilidad y evitar strikes por desinformación.
    - Inyección de Personas, Títulos de 8 palabras, y formato Multi-Voz para evadir fatiga semántica de los LLMs.
    - **Formant Shift** (reemplaza `atempo=1.02`): Altera timbre de voz sin cambiar velocidad, indetectable.
    - **Glitch RGB** (reemplaza strobing 3s): Efecto visual seguro de 0.5s, cumple políticas de epilepsia.

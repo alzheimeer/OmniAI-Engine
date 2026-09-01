@@ -1,5 +1,6 @@
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
+import Parser from 'rss-parser';
 import { Database } from '../db/Database';
 import { RetryHandler } from '../infrastructure/RetryHandler';
 
@@ -105,6 +106,41 @@ export class SEOAgent {
         baseURL: process.env.OPENAI_BASE_URL || 'https://api.deepseek.com',
         apiKey: process.env.DEEPSEEK_API_KEY || process.env.OPENAI_API_KEY,
     });
+    
+    private static rssParser = new Parser({
+        timeout: 5000,
+        headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) OmniAI-Engine',
+            'Accept': 'application/rss+xml, application/xml, text/xml'
+        }
+    });
+
+    /**
+     * Fetch recent news via RSS to ground the LLM
+     */
+    private static async fetchDailyNews(channelKey: 'channel1' | 'channel2'): Promise<string> {
+        try {
+            const feedUrl = channelKey === 'channel1' 
+                ? 'https://www.spectrumnews.org/feed/' 
+                : 'https://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml';
+                
+            console.log(`📡 SEOAgent: Obteniendo noticias de grounding desde ${feedUrl}`);
+            const feed = await this.rssParser.parseURL(feedUrl);
+            
+            if (!feed.items || feed.items.length === 0) return '';
+            
+            const recentNews = feed.items.slice(0, 3).map((item, idx) => {
+                const title = item.title || 'Sin título';
+                const summary = item.contentSnippet || item.content || 'Sin resumen detallado';
+                return `Noticia ${idx + 1}: [${title}] - ${summary.substring(0, 400)}...`;
+            }).join('\n\n');
+            
+            return `\nNOTICIAS RECIENTES PARA GROUNDING EMPÍRICO (Úsalas como contexto fáctico obligatorio para elegir tu tema):\n${recentNews}\n`;
+        } catch (error) {
+            console.warn(`⚠️ SEOAgent: Error obteniendo RSS para ${channelKey}. Fallback a generación sin grounding.`);
+            return '';
+        }
+    }
 
     /**
      * Generates a trending topic and a full SEO strategy (Viral Title + 15-20 Tags)
@@ -124,6 +160,36 @@ export class SEOAgent {
     ): Promise<SEOStrategy> {
         const MAX_RETRIES = 3;
         
+        // [NUEVO] INTERCEPTOR DE DAEMON SEO (PRIORIDAD #1)
+        // Solo intentamos jalar la base de datos en el primer intento para no crear bucles
+        if (retryCount === 0) {
+            try {
+                const pendingTrends = await Database.getPendingTrendingIdeas(1);
+                if (pendingTrends && pendingTrends.length > 0) {
+                    const trend = pendingTrends[0];
+                    console.log(`🔥 [SEOAgent] Interceptando IDEA VIRAL Matemática del Daemon: "${trend.title}"`);
+                    
+                    // Marcar como usada para que no se vuelva a publicar
+                    await Database.markTrendingIdeaAsUsed(trend.id);
+                    
+                    let parsedKeywords = [];
+                    try { parsedKeywords = JSON.parse(trend.keywords || '[]'); } catch (e) {}
+
+                    return {
+                        rawTopic: trend.topic,
+                        viralTitle: trend.title,
+                        keywords: parsedKeywords.length > 0 ? parsedKeywords : [trend.topic, 'viral', 'novedad'],
+                        recommendedPostingFrequency: `¡Pico matemático detectado (+${trend.score}%). Publicar URGENTE.`,
+                        feedbackAnalysis: `Generado por TrendMonitor Daemon vía ${trend.source}`,
+                        targetDurationMinutes: contentType === 'video' ? 1 : undefined, // Asumimos short por urgencia
+                        wordCountRange: contentType === 'blog' ? "1200-1500" : "150-180",
+                    };
+                }
+            } catch (error) {
+                console.error("⚠️ Error conectando al Daemon SEO. Fallback a LLM Generativo Estándar:", error);
+            }
+        }
+        
         const channelName = channelKey === 'channel1' ? 'NeuroSync AI' : 'NeuroTech AI';
         console.log(`🤖 SEOAgent: Investigando tendencias para ${channelName} en ${language}...${retryCount > 0 ? ` (intento ${retryCount + 1}/${MAX_RETRIES + 1})` : ''}`);
         
@@ -141,6 +207,9 @@ export class SEOAgent {
         const previousTopicsText = previousTopics.length > 0
             ? `\n\nTEMAS YA PUBLICADOS (NO REPETIR - GENERAR ALGO DIFERENTE):\n${previousTopics.map((t, i) => `${i + 1}. ${t}`).join('\n')}`
             : '';
+            
+        // RAG Empírico
+        const newsGroundingText = await this.fetchDailyNews(channelKey);
         
         const isChannel2 = channelKey === 'channel2';
         const channelNiche = isChannel2 
@@ -189,6 +258,7 @@ Do not include any greetings or markdown blocks around the JSON. ONLY output val
         const userPrompt = `Historical Channel & Content Performance Analytics:
 ${performanceContext || 'No historical data available yet. Start with core trending concepts.'}
 ${previousTopicsText}
+${newsGroundingText}
 
 Analyze current tech trends around Artificial Intelligence, Autism, Neurodiversity, and productivity.
 IMPORTANT: Generate a topic that is DIFFERENT from all the previous topics listed.
@@ -816,4 +886,4 @@ ${tiktokCTA}`.substring(0, 150);
         
         return detectedMood;
     }
-}
+}

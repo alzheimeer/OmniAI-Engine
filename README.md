@@ -8,7 +8,7 @@ OmniAI-Engine es un motor de Inteligencia Artificial totalmente autónomo diseñ
 
 ## Características Principales
 
-- **SEO Agent (El Estratega y Bucle de Retroalimentación):** Analiza el rendimiento histórico de videos/blogs almacenado en una base de datos local SQLite (`content/database.sqlite`), detecta tendencias de interacción bajo barreras estrictas del nicho (**Autismo e IA**), y genera temas virales, títulos, 15-20 palabras clave y recomendaciones de frecuencia dinámicas usando DeepSeek. Incluye **deduplicación de temas** para evitar repetir contenido.
+- **SEO Agent (El Estratega y Bucle de Retroalimentación):** Analiza el rendimiento histórico de videos/blogs almacenado en una base de datos local SQLite (`content/database.sqlite`), detecta tendencias de interacción bajo barreras estrictas del nicho (**Autismo e IA**), y genera temas virales, títulos, 15-20 palabras clave y recomendaciones de frecuencia dinámicas usando DeepSeek. Incluye **Grounding Empírico RAG (rss-parser)** anclándose en noticias reales de *Spectrum News* o *ScienceDaily* para evitar contenido sintético y repetitivo.
 - **Analytics Engine (El Científico):** Se conecta a la API de Datos de YouTube v3 para obtener conteo de suscriptores, vistas de videos y likes en tiempo real, retroalimentando al SEO Agent.
 - **Script & Blog Generators (Los Escritores):** Escribe cortos atractivos de 60s, documentales de 5m y artículos markdown de más de 1000 palabras sobre Inteligencia Artificial y Neurodiversidad.
 - **Audio Generator (La Voz):** Usa Google Cloud TTS para voces superpuestas con **división automática de texto (chunking)** para manejar guiones que exceden el límite de 5000 bytes de la API.
@@ -254,7 +254,7 @@ Para Asistentes de IA y mantenedores, consulta `CLAUDE.md` y `GEMINI.md` en el d
 - ✅ **Estadísticas de Base de Datos:** Nuevo método `getStats()` para métricas de contenido agregadas.
 - ✅ **Monitoreo de Almacenamiento:** Monitoreo asíncrono y automatizado del espacio en disco para prevenir fallas en la descarga de contenido.
 - ✅ **Evasión de Detección y Retención Extrema:**
-  - **Estrategia Híbrida de Publicación:** 1 de cada 5 videos se publica como **privado/no listado** para permitir revisión humana antes de hacerlo público. Esto garantiza interacción humana consistente y evita el "shadowban de API" por patrones de publicación 100% automatizados.
+  - **Estrategia YMYL 100% Automatizada:** Se inyecta un *Disclaimer Educativo/Médico* de manera obligatoria en todas las descripciones de YouTube. Ya no se usa borrador de publicación híbrida, logrando un proceso autónomo de principio a fin mitigando revisiones manuales de políticas de YouTube.
   - **Fatiga Semántica Rota:** Títulos cortos (< 8 palabras), Personas dinámicas, prohibición de frases cliché de IA y guiones Multi-Voz.
   - **Formant Shift (reemplaza atempo=1.02):** Técnica `asetrate*1.02,aresample,atempo=0.9804` que altera el timbre sin cambiar velocidad. Indetectable por YouTube.
   - **I2V Híbrido:** Segmentos KEY (intro/outro) usan Image-to-Video para control visual preciso. Segmentos FILLER usan T2V del pool.
