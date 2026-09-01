@@ -274,7 +274,7 @@ The JSON must have this exact structure:
 {
   "title": "A viral, clickbaity YouTube title under 60 chars",
   "description": "A 3 sentence SEO optimized description",
-  "tags": ["autism", "ai", "neurodiversity", "tech", "etc"],
+  "tags": ["relevant_keyword1", "relevant_keyword2", "relevant_keyword3", "topic_tag"],
   "hook": "The exact words for the first 3 seconds - must grab attention IMMEDIATELY",
   "spokenText": "The REST of the script AFTER the hook. The hook will be prepended automatically. Keep it punchy, conversational, no emojis, around 130-140 words.",
   "visualPrompts": ["1-3 words stock video keyword", "abstract data", "coding screen"],
@@ -416,7 +416,7 @@ The JSON must have this exact structure:
 {
   "title": "A highly clickable YouTube title under 60 chars",
   "description": "A detailed SEO optimized description with key points mentioned",
-  "tags": ["autism", "ai", "neurodiversity", "tech", "etc"],
+  "tags": ["relevant_keyword1", "relevant_keyword2", "relevant_keyword3", "topic_tag"],
   "hook": "The exact words for the first 10 seconds - must grab attention",
   "spokenText": "The entire script text for the voiceover (${words} words). MUST start with the hook. Keep it engaging, educational, and professional.",
   "visualPrompts": ["technology", "neon brain", "abstract data", "coding screen", "happy family", "office", "robot", "light bulb", "medical", "brain"],

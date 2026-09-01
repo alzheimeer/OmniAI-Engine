@@ -9,4 +9,5 @@ const changelog = `
 
 fs.appendFileSync('README.md', changelog);
 fs.appendFileSync('GEMINI.md', changelog);
+fs.appendFileSync('CLAUDE.md', changelog);
 console.log('Docs updated');
