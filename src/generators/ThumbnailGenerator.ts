@@ -237,6 +237,16 @@ export class ThumbnailGenerator {
         const escapedTitle = this.escapeHtml(title);
         const highlightedTitle = this.highlightKeywords(escapedTitle);
 
+        const palettes = [
+            { color: '#00d4ff', r: 4, g: 7, b: 16 },    // Cyan/Dark Blue
+            { color: '#ff2a5f', r: 20, g: 5, b: 8 },    // Neon Pink/Dark Red
+            { color: '#ffaa00', r: 18, g: 12, b: 4 },   // Neon Orange/Dark Brown
+            { color: '#00fa9a', r: 4, g: 18, b: 10 },   // Neon Mint/Dark Green
+            { color: '#b829ff', r: 12, g: 4, b: 18 },   // Neon Purple/Dark Purple
+            { color: '#fcee21', r: 18, g: 18, b: 4 }    // Neon Yellow/Dark Yellow
+        ];
+        const palette = palettes[this.getStyleIndex(title, palettes.length)];
+
         let html = '';
 
         if (isShort) {
@@ -244,8 +254,8 @@ export class ThumbnailGenerator {
             // PLANTILLA SHORTS VERTICALES (9:16 - 1080x1920)
             // ==========================================
             const backgroundStyle = backgroundImageUrl
-                ? `background-image: linear-gradient(180deg, rgba(6,10,22,0.85) 0%, rgba(6,10,22,0.1) 40%, rgba(6,10,22,0.85) 100%), url('${backgroundImageUrl}'); background-size: cover; background-position: center;`
-                : `background: linear-gradient(135deg, #0a0e1a 0%, #061126 50%, #031b33 100%);`;
+                ? `background-image: linear-gradient(180deg, rgba(${palette.r},${palette.g},${palette.b},0.80) 0%, rgba(${palette.r},${palette.g},${palette.b},0.1) 40%, rgba(${palette.r},${palette.g},${palette.b},0.85) 100%), url('${backgroundImageUrl}'); background-size: cover; background-position: center;`
+                : `background: linear-gradient(135deg, rgba(${palette.r+5},${palette.g+5},${palette.b+10},1) 0%, rgba(${palette.r},${palette.g},${palette.b},1) 100%);`;
             const badge1 = (badges && badges.length > 0) ? badges[0].toUpperCase() : 'NUEVA IA';
             const htmlBadges = `<div class="badge">${this.escapeHtml(badge1)}</div>`;
 
@@ -277,7 +287,7 @@ export class ThumbnailGenerator {
                         z-index: 10;
                     }
                     .badge {
-                        background: #00d4ff;
+                        background: ${palette.color};
                         color: #030712;
                         font-size: 24px;
                         font-weight: 900;
@@ -286,7 +296,7 @@ export class ThumbnailGenerator {
                         margin-bottom: 24px;
                         letter-spacing: 2px;
                         text-transform: uppercase;
-                        box-shadow: 0 0 25px rgba(0,212,255,0.6);
+                        box-shadow: 0 0 25px ${palette.color}99;
                     }
                     .title {
                         font-size: 65px;
@@ -303,18 +313,18 @@ export class ThumbnailGenerator {
                             0 10px 30px rgba(0,0,0,0.95);
                     }
                     .highlight {
-                        color: #00d4ff;
+                        color: ${palette.color};
                         text-shadow: 
                             3px 3px 0 #000,
                             -3px -3px 0 #000,
-                            0 0 35px rgba(0, 212, 255, 0.95);
+                            0 0 35px ${palette.color}f2;
                     }
                     .brand {
                         position: absolute;
                         bottom: 45px;
                         font-size: 28px;
                         font-weight: 900;
-                        color: #00d4ff;
+                        color: ${palette.color};
                         letter-spacing: 3px;
                         text-shadow: 0 3px 12px rgba(0,0,0,0.95);
                     }
@@ -332,11 +342,10 @@ export class ThumbnailGenerator {
         } else {
             // ==========================================
             // PLANTILLA VIDEOS LARGOS HORIZONTALES (16:9 - 1280x720)
-            // DISEÑO ASIMÉTRICO (REGLA DE TERCIOS: TEXTO IZQUIERDA, ARTE DERECHA)
             // ==========================================
             const backgroundStyle = backgroundImageUrl
-                ? `background-image: linear-gradient(90deg, rgba(4,7,16,0.95) 0%, rgba(4,7,16,0.85) 45%, rgba(4,7,16,0.2) 80%, rgba(4,7,16,0.05) 100%), url('${backgroundImageUrl}'); background-size: cover; background-position: right center;`
-                : `background: linear-gradient(135deg, #0a0e1a 0%, #061126 50%, #031b33 100%);`;
+                ? `background-image: linear-gradient(90deg, rgba(${palette.r},${palette.g},${palette.b},0.90) 0%, rgba(${palette.r},${palette.g},${palette.b},0.75) 45%, rgba(${palette.r},${palette.g},${palette.b},0.15) 80%, rgba(${palette.r},${palette.g},${palette.b},0.05) 100%), url('${backgroundImageUrl}'); background-size: cover; background-position: right center;`
+                : `background: linear-gradient(135deg, rgba(${palette.r+5},${palette.g+5},${palette.b+10},1) 0%, rgba(${palette.r},${palette.g},${palette.b},1) 100%);`;
 
             const badge1 = (badges && badges.length > 0) ? badges[0].toUpperCase() : 'NUEVA IA';
             const badge2 = (badges && badges.length > 1) ? badges[1].toUpperCase() : 'GUÍA DEFINITIVA';
@@ -376,7 +385,7 @@ export class ThumbnailGenerator {
                         margin-bottom: 18px;
                     }
                     .badge {
-                        background: #00d4ff;
+                        background: ${palette.color};
                         color: #030712;
                         font-size: 20px;
                         font-weight: 900;
@@ -384,7 +393,7 @@ export class ThumbnailGenerator {
                         border-radius: 8px;
                         letter-spacing: 2px;
                         text-transform: uppercase;
-                        box-shadow: 0 0 20px rgba(0,212,255,0.6);
+                        box-shadow: 0 0 20px ${palette.color}99;
                     }
                     .badge-secondary {
                         background: rgba(255,255,255,0.15);
@@ -413,11 +422,11 @@ export class ThumbnailGenerator {
                             0 10px 30px rgba(0,0,0,0.95);
                     }
                     .highlight {
-                        color: #00d4ff;
+                        color: ${palette.color};
                         text-shadow: 
                             3px 3px 0 #000,
                             -3px -3px 0 #000,
-                            0 0 35px rgba(0, 212, 255, 0.95);
+                            0 0 35px ${palette.color}f2;
                     }
                     .brand {
                         position: absolute;
@@ -425,7 +434,7 @@ export class ThumbnailGenerator {
                         left: 60px;
                         font-size: 20px;
                         font-weight: 900;
-                        color: #00d4ff;
+                        color: ${palette.color};
                         letter-spacing: 2.5px;
                         text-shadow: 0 2px 8px rgba(0,0,0,0.9);
                     }
