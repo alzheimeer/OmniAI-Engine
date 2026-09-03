@@ -119,27 +119,39 @@ export class SEOAgent {
      * Fetch recent news via RSS to ground the LLM
      */
     private static async fetchDailyNews(channelKey: 'channel1' | 'channel2' | 'channel3'): Promise<string> {
-        try {
-            const feedUrl = channelKey === 'channel1' 
-                ? 'https://www.spectrumnews.org/feed/' 
-                : 'https://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml';
+        // Feeds prioritarios y de respaldo por canal
+        const feedCandidates = channelKey === 'channel1'
+            ? [
+                'https://www.sciencedaily.com/rss/mind_brain/autism.xml',
+                'https://www.thetransmitter.org/spectrum/feed/',
+                'https://news.google.com/rss/search?q=autism+research+when:7d&hl=en-US&gl=US&ceid=US:en'
+              ]
+            : [
+                'https://www.sciencedaily.com/rss/computers_math/artificial_intelligence.xml',
+                'https://news.google.com/rss/search?q=artificial+intelligence+when:7d&hl=en-US&gl=US&ceid=US:en'
+              ];
+
+        for (const feedUrl of feedCandidates) {
+            try {
+                console.log(`📡 SEOAgent: Intentando obtener noticias de grounding desde ${feedUrl}`);
+                const feed = await this.rssParser.parseURL(feedUrl);
                 
-            console.log(`📡 SEOAgent: Obteniendo noticias de grounding desde ${feedUrl}`);
-            const feed = await this.rssParser.parseURL(feedUrl);
-            
-            if (!feed.items || feed.items.length === 0) return '';
-            
-            const recentNews = feed.items.slice(0, 3).map((item, idx) => {
-                const title = item.title || 'Sin título';
-                const summary = item.contentSnippet || item.content || 'Sin resumen detallado';
-                return `Noticia ${idx + 1}: [${title}] - ${summary.substring(0, 400)}...`;
-            }).join('\n\n');
-            
-            return `\nNOTICIAS RECIENTES PARA GROUNDING EMPÍRICO (Úsalas como contexto fáctico obligatorio para elegir tu tema):\n${recentNews}\n`;
-        } catch (error) {
-            console.warn(`⚠️ SEOAgent: Error obteniendo RSS para ${channelKey}. Fallback a generación sin grounding.`);
-            return '';
+                if (!feed.items || feed.items.length === 0) continue;
+                
+                const recentNews = feed.items.slice(0, 3).map((item, idx) => {
+                    const title = item.title || 'Sin título';
+                    const summary = item.contentSnippet || item.content || 'Sin resumen detallado';
+                    return `Noticia ${idx + 1}: [${title}] - ${summary.substring(0, 400)}...`;
+                }).join('\n\n');
+                
+                return `\nNOTICIAS RECIENTES PARA GROUNDING EMPÍRICO (Úsalas como contexto fáctico obligatorio para elegir tu tema):\n${recentNews}\n`;
+            } catch (feedError) {
+                console.warn(`⚠️ SEOAgent: Error con feed ${feedUrl}, probando siguiente respaldo...`);
+            }
         }
+
+        console.warn(`⚠️ SEOAgent: No se pudo obtener ningún feed RSS para ${channelKey}. Fallback a generación sin grounding.`);
+        return '';
     }
 
     /**
